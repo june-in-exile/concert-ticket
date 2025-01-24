@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
     "@web3auth/auth-adapter": "^9.5.3",
     "@web3auth/base": "^9.5.3",
     "@web3auth/ethereum-provider": "^9.5.3",
