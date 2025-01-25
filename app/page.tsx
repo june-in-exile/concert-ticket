@@ -93,7 +93,7 @@ export default function Home() {
           return;
         }
 
-        if (!provider) { 
+        if (!provider) {
           console.log("provider not initialized yet");
           return;
         }
@@ -142,17 +142,17 @@ export default function Home() {
 
   const loginButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
-      aria-label="Login with Google"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 px-4 sm:px-5 sm:min-w-20 group absolute top-0 right-0 m-4 text-2xl"
+      aria-label="Login"
       onClick={loginWithGoogle}
     >
-      Login with Google
+      Login
     </button>
   );
 
   const logoutButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 px-4 sm:px-5 sm:min-w-20 group absolute top-0 right-0 m-4 text-2xl"
       aria-label="Logout"
       onClick={logout}
     >
@@ -173,8 +173,7 @@ export default function Home() {
   return (
     <>
       <div className="flex gap-4 items-center justify-center flex-col sm:flex-row" >
-        {loggedIn ? logoutButton : loginButton}
-        {showAccountButton}
+        {loggedIn ? <>{logoutButton}{showAccountButton}</> : loginButton}
       </div>
     </>
   );
