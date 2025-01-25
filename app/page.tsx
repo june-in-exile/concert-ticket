@@ -138,7 +138,7 @@ export default function Home() {
 
   const loginButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 px-4 sm:px-5 sm:min-w-20 group absolute top-0 right-0 m-4 text-2xl"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-20 sm:w-20 group absolute top-0 right-0 m-6 text-2xl"
       aria-label="Login"
       onClick={loginWithGoogle}
     >
