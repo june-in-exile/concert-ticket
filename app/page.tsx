@@ -1,16 +1,23 @@
-'use client'
+"use client";
 import React, { useEffect } from "react";
-import { useRouter } from 'next/navigation';
-import { useAddress, useProvider, useWeb3Auth } from './context';
+import { useRouter } from "next/navigation";
+import { useAddress, useProvider, useWeb3Auth } from "./context";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
-import { WALLET_ADAPTERS, CHAIN_NAMESPACES, WEB3AUTH_NETWORK, UX_MODE } from "@web3auth/base";
+import {
+  WALLET_ADAPTERS,
+  CHAIN_NAMESPACES,
+  WEB3AUTH_NETWORK,
+  UX_MODE,
+} from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
-import { createWalletClient, custom } from 'viem'
-import { sepolia } from 'viem/chains'
+import { createWalletClient, custom } from "viem";
+import { sepolia } from "viem/chains";
 
-const w3a_clientId = "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from https://dashboard.web3auth.io
-const google_client_id = "63140164655-5fsi5uk3ufolbtufe9ovofm2uf5mho39.apps.googleusercontent.com";
+const w3a_clientId =
+  "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from https://dashboard.web3auth.io
+const google_client_id =
+  "63140164655-5fsi5uk3ufolbtufe9ovofm2uf5mho39.apps.googleusercontent.com";
 
 export default function Home() {
   const router = useRouter();
@@ -34,7 +41,9 @@ export default function Home() {
           logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
         };
 
-        const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
+        const privateKeyProvider = new EthereumPrivateKeyProvider({
+          config: { chainConfig },
+        });
 
         const web3AuthInstance = new Web3AuthNoModal({
           clientId: w3a_clientId,
@@ -74,7 +83,7 @@ export default function Home() {
 
         if (web3AuthInstance.connected) {
           console.log("web3AuthInstance connected!");
-        };
+        }
       } catch (error) {
         console.error(error);
       }
@@ -99,7 +108,7 @@ export default function Home() {
     const getAccount = async () => {
       const walletClient = createWalletClient({
         chain: sepolia,
-        transport: custom(provider)
+        transport: custom(provider),
       });
 
       const addresses = await walletClient.getAddresses();
@@ -113,7 +122,7 @@ export default function Home() {
   const getAccount = async () => {
     const walletClient = createWalletClient({
       chain: sepolia,
-      transport: custom(provider)
+      transport: custom(provider),
     });
 
     const addresses = await walletClient.getAddresses();
@@ -148,7 +157,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex gap-4 items-center justify-center flex-col sm:flex-row" >
+      <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
         {loginButton}
       </div>
     </>

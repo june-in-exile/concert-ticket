@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 const addressContext = createContext(null);
 
 export const Address = ({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) => {
-    const [address, setAddress] = useState<`0x${string}` | null>(null);
-    return (
-        <addressContext.Provider value={{ address, setAddress }}>
-            {children}
-        </addressContext.Provider>
-    );
+  const [address, setAddress] = useState<`0x${string}` | null>(null);
+  return (
+    <addressContext.Provider value={{ address, setAddress }}>
+      {children}
+    </addressContext.Provider>
+  );
 };
 
 export const useAddress = () => useContext(addressContext);
