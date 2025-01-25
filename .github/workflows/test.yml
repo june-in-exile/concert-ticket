@@ -16,6 +16,10 @@ jobs:
     name: Foundry project
     runs-on: ubuntu-latest
     steps:
+      - name: change direcory
+        run: |
+          cd contract
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
