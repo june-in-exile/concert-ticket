@@ -6,7 +6,7 @@ import { useAddress, useWeb3Auth } from "../context";
 
 export default function Poll() {
   const router = useRouter();
-  const { address, setAddress } = useAddress();
+  const { setAddress } = useAddress();
   const { web3Auth } = useWeb3Auth();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Poll() {
 
   const buyTicketButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#FFFFCE] text-sm sm:text-base h-10 sm:h-12 sm:min-px-5 w-40 sm:w-40 relative group"
       aria-label="Buy Ticket"
       onClick={buyTicket}
     >
@@ -63,7 +63,7 @@ export default function Poll() {
 
   const validateTicketButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#E8FFC4] text-sm sm:text-base h-10 sm:h-12 sm:min-px-5 w-40 sm:w-40 relative group"
       aria-label="Validate Ticket"
       onClick={validateTicket}
     >
@@ -77,7 +77,7 @@ export default function Poll() {
 
   const cancelTicketButton = (
     <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#FFDAC8] text-sm sm:text-base h-10 sm:h-12 sm:min-px-5 w-40 sm:w-40 relative group"
       aria-label="Cancel Ticket"
       onClick={cancelTicket}
     >
@@ -86,11 +86,11 @@ export default function Poll() {
   );
 
   return (
-    <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
-      {logoutButton}
-      {buyTicketButton}
-      {validateTicketButton}
-      {cancelTicketButton}
+    <div className="flex gap-4 items-center justify-center flex-col sm:flex-col">
+      {logoutButton} {/* top right */}
+      {buyTicketButton} {/* center top */}
+      {validateTicketButton} {/* center center */}
+      {cancelTicketButton} {/* center bottom */}
     </div>
   );
 }
