@@ -33,10 +33,6 @@ export default function Poll() {
     console.log("Logged out!");
   };
 
-  const showAccount = async () => {
-    console.log("User Address:", address);
-  };
-
   const logoutButton = (
     <button
       className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-20 sm:w-20 group absolute top-0 right-0 m-6 text-2xl"
@@ -47,20 +43,54 @@ export default function Poll() {
     </button>
   );
 
-  const showAccountButton = (
+  const buyTicket = async () => {
+    console.log("Buy Ticket");
+  };
+
+  const buyTicketButton = (
     <button
       className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
-      aria-label="Show User's Account"
-      onClick={showAccount}
+      aria-label="Buy Ticket"
+      onClick={buyTicket}
     >
-      Show Account
+      Buy Ticket
+    </button>
+  );
+
+  const validateTicket = async () => {
+    console.log("Validate Ticket");
+  };
+
+  const validateTicketButton = (
+    <button
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      aria-label="Validate Ticket"
+      onClick={validateTicket}
+    >
+      Validate Ticket
+    </button>
+  );
+
+  const cancelTicket = async () => {
+    console.log("Cancel Ticket");
+  };
+
+  const cancelTicketButton = (
+    <button
+      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-20 relative group"
+      aria-label="Cancel Ticket"
+      onClick={cancelTicket}
+    >
+      Cancel Ticket
     </button>
   );
 
   return (
     <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
       {logoutButton}
-      {showAccountButton}
+      {buyTicketButton}
+      {validateTicketButton}
+      {cancelTicketButton}
     </div>
   );
 }
