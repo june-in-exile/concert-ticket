@@ -1,24 +1,32 @@
-name: CI
+name: Foundry Tests
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
+  test:
     strategy:
       fail-fast: true
 
     name: contract-testing
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        # with:
+        #   submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.21;
 
 import "forge-std/Test.sol";
-import "../src/TicketNFT.sol";
+import "@src/ticketNFT.sol";
 
 contract TicketNFTTest is Test {
     TicketNFT public ticketNFT;
