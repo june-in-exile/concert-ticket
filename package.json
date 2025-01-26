@@ -19,6 +19,7 @@
     "@web3auth/wallet-services-plugin": "^9.5.3",
     "dotenv": "^16.4.7",
     "next": "15.1.6",
+    "path": "^0.12.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tronweb": "^6.0.1",
