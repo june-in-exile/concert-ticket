@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Compiler files
+cache/
+out/
+
+# Ignores development logs
+foundry/broadcast/*
+foundry/.gas-snapshot
+
+# Docs
+docs/

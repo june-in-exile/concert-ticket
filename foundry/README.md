@@ -49,7 +49,13 @@ $ anvil
 
 ```shell
 $ source .env
-$ forge script script/ticketNFT.s.sol:TicketNFTScript --broadcast --verify --rpc-url ${ARB_SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY}
+$ forge script \
+    --broadcast \
+    --verify \
+    --rpc-url ${ARB_SEPOLIA_RPC_URL} \
+    --etherscan-api-key ${ARBISCAN_API_KEY} \
+    --private-key ${PRIVATE_KEY}
+    script/ticketNFT.s.sol:TicketNFTScript
 ```
 
 ### Verify
