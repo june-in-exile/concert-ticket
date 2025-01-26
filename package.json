@@ -17,11 +17,14 @@
     "@web3auth/modal": "^9.5.3",
     "@web3auth/no-modal": "^9.5.3",
     "@web3auth/wallet-services-plugin": "^9.5.3",
+    "dotenv": "^16.4.7",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tronweb": "^6.0.1",
-    "viem": "^2.22.13"
+    "ts-node": "^10.9.2",
+    "viem": "^2.22.13",
+    "web3modal": "^1.9.12"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

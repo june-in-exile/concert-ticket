@@ -48,7 +48,7 @@ $ anvil
 ### Deploy
 
 ```shell
-$ source .env
+$ source ../.env
 $ forge script \
     --broadcast \
     --verify \
@@ -61,7 +61,7 @@ $ forge script \
 ### Verify
 
 ```shell
-$ source .env
+$ source ../.env
 $ forge verify-contract \
     --chain-id 421614 \
     --num-of-optimizations 1000000 \
