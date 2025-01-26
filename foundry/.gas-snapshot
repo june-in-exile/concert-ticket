@@ -1,0 +1,4 @@
+TicketNFTTest:testBuyTicket() (gas: 105154)
+TicketNFTTest:testCancelInvalidTicket() (gas: 86463)
+TicketNFTTest:testCancelTicket() (gas: 85720)
+TicketNFTTest:testCancelTicketNotOwner() (gas: 106155)

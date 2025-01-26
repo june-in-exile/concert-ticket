@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TicketNFT is ERC721, Ownable(msg.sender) {
-    uint256 public nextTokenId;
-    mapping(uint256 => bool) public validTickets;
+    uint256 private nextTokenId;
+    mapping(uint256 => bool) private validTickets;
 
     constructor() ERC721("TicketNFT", "TNFT") {}
 

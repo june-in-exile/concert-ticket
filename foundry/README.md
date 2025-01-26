@@ -48,7 +48,22 @@ $ anvil
 ### Deploy
 
 ```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+$ source .env
+$ forge script script/ticketNFT.s.sol:TicketNFTScript --broadcast --verify --rpc-url ${ARB_SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY}
+```
+
+### Verify
+
+```shell
+$ source .env
+$ forge verify-contract \
+    --chain-id 421614 \
+    --num-of-optimizations 1000000 \
+    --watch \
+    --constructor-args $(cast abi-encode "constructor()") \
+    --etherscan-api-key ${ARBISCAN_API_KEY} \
+    ${CONTRACT_ADDRESS} \
+    src/ticketNFT.sol:TicketNFT
 ```
 
 ### Cast

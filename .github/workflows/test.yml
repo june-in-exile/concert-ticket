@@ -17,16 +17,16 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: contract-testing
+    name: foundry-testing
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: contract
+        working-directory: foundry
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        # with:
-        #   submodules: recursive
+        with:
+          submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
