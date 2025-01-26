@@ -10,24 +10,35 @@ export const TicketNFT = ({ children }) => {
   const buyOnChain = async () => {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const signer = new ethers.Wallet(privateKey, provider);
-    const contractWithSigner = new ethers.Contract(contractAddress, ticketNFT.abi, signer);
-    await contractWithSigner.buyTicket()
-      .then(transaction => {
+    const contractWithSigner = new ethers.Contract(
+      contractAddress,
+      ticketNFT.abi,
+      signer,
+    );
+    await contractWithSigner
+      .buyTicket()
+      .then((transaction) => {
         console.log("Transaction Mined", transaction);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };
-
+  
   const validateOnChain = async (ticketId: number) => {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const contractWithProvider = new ethers.Contract(contractAddress, ticketNFT.abi, provider);
-    await contractWithProvider.isTicketValid(ticketId)
-      .then(isValid => {
+    const contractWithProvider = new ethers.Contract(
+      contractAddress,
+      ticketNFT.abi,
+      provider,
+    );
+    await contractWithProvider
+      .isTicketValid(ticketId)
+      .then((isValid) => {
+        console.log("isValid = ", isValid);
         return isValid;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };
@@ -35,12 +46,17 @@ export const TicketNFT = ({ children }) => {
   const cancelOnChain = async (ticketId: number) => {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const signer = new ethers.Wallet(privateKey, provider);
-    const contractWithSigner = new ethers.Contract(contractAddress, ticketNFT.abi, signer);
-    await contractWithSigner.cancelTicket(ticketId)
-      .then(transaction => {
+    const contractWithSigner = new ethers.Contract(
+      contractAddress,
+      ticketNFT.abi,
+      signer,
+    );
+    await contractWithSigner
+      .cancelTicket(ticketId)
+      .then((transaction) => {
         console.log("Transaction Mined", transaction);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };

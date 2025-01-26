@@ -71,21 +71,22 @@ export default function Ticket() {
       if (ticketID_pattern.test(validatedTicket)) {
         const ticketID = parseInt(validatedTicket);
         console.log("Validate Ticket ID %d", ticketID);
-        try {
-          const isValid: boolean = await validateOnChain(ticketID);
-          if (isValid) {
-            console.log("Ticket %d is valid.", ticketID);
-          } else {
-            console.log("Ticket %d is not valid.", ticketID);
-          }
-        } catch (error) {
-          console.error('Error while validating ticket:', error);
-        };
+        await validateOnChain(ticketID)
+          .then((isValid: boolean) => {
+            if (isValid) {
+              console.log("Ticket %d is valid.", ticketID);
+            } else {
+              console.log("Ticket %d is not valid.", ticketID);
+            }
+          })
+          .catch((error) => {
+            console.error("Error while validating ticket:", error);
+          });
         setValidatedTicket("");
       } else {
         alert(invalid_ticketID_msg);
-      }
-    }
+      };
+    };
   };
 
   const validateTicketInput = (
@@ -108,16 +109,15 @@ export default function Ticket() {
       if (ticketID_pattern.test(cancelledTicket)) {
         const ticketID = parseInt(cancelledTicket);
         console.log("Cancel Ticket ID %d", ticketID);
-        try {
-          await cancelOnChain(ticketID);
-        } catch (error) {
-          console.error('Error while cancelling ticket:', error);
-        };
+        await cancelOnChain(ticketID).
+          catch((error) => {
+            console.error("Error while cancelling ticket:", error);
+          });
         setCancelledTicket("");
       } else {
         alert(invalid_ticketID_msg);
-      }
-    }
+      };
+    };
   };
 
   const cancelTicketInput = (
