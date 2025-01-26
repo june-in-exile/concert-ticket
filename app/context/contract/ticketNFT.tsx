@@ -24,7 +24,7 @@ export const TicketNFT = ({ children }) => {
         console.error(error);
       });
   };
-  
+
   const validateOnChain = async (ticketId: number) => {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const contractWithProvider = new ethers.Contract(

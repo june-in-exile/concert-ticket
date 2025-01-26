@@ -85,8 +85,8 @@ export default function Ticket() {
         setValidatedTicket("");
       } else {
         alert(invalid_ticketID_msg);
-      };
-    };
+      }
+    }
   };
 
   const validateTicketInput = (
@@ -109,15 +109,14 @@ export default function Ticket() {
       if (ticketID_pattern.test(cancelledTicket)) {
         const ticketID = parseInt(cancelledTicket);
         console.log("Cancel Ticket ID %d", ticketID);
-        await cancelOnChain(ticketID).
-          catch((error) => {
-            console.error("Error while cancelling ticket:", error);
-          });
+        await cancelOnChain(ticketID).catch((error) => {
+          console.error("Error while cancelling ticket:", error);
+        });
         setCancelledTicket("");
       } else {
         alert(invalid_ticketID_msg);
-      };
-    };
+      }
+    }
   };
 
   const cancelTicketInput = (
