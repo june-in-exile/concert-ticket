@@ -11,9 +11,7 @@ export const Context = ({ children }: { children: ReactNode }) => {
     <Address>
       <Provider>
         <Web3Auth>
-          <TicketNFT>
-            {children}
-          </TicketNFT>
+          <TicketNFT>{children}</TicketNFT>
         </Web3Auth>
       </Provider>
     </Address>

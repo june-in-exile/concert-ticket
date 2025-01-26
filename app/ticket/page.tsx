@@ -7,10 +7,11 @@ import { useAddress, useWeb3Auth } from "../context";
 
 export default function Ticket() {
   const router = useRouter();
-  const [validatedTicket, setValidatedTicket] = useState('');
-  const [cancelledTicket, setCancelledTicket] = useState('');
+  const [validatedTicket, setValidatedTicket] = useState("");
+  const [cancelledTicket, setCancelledTicket] = useState("");
   const { setAddress } = useAddress();
   const { web3Auth } = useWeb3Auth();
+  const INVALID_TICKET_ID_MSG = "Ticket ID should be a nonnegative integer.";
   // const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
 
   useEffect(() => {
@@ -67,16 +68,15 @@ export default function Ticket() {
   };
 
   const validateTicket = (event) => {
-    if (event.key === 'Enter' && validatedTicket.trim() !== '') {
-      const ticketID = parseFloat(validatedTicket);
-      if (!isNaN(ticketID) && Number.isInteger(ticketID) && ticketID >= 0) {
-        console.log('Validate Ticket ID %d', ticketID);
+    if (event.key === "Enter") {
+      if (/^[0-9]+$/.test(validatedTicket)) {
+        console.log("Validate Ticket ID %d", parseInt(validatedTicket));
+        setValidatedTicket("");
+        // validateOnChain();
       } else {
-        alert('Please enter a valid Ticket ID.');
+        alert(INVALID_TICKET_ID_MSG);
       }
-      setValidatedTicket('');
     }
-    // validateOnChain();
   };
 
   const validateTicketInput = (
@@ -84,6 +84,7 @@ export default function Ticket() {
       className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#E8FFC4] text-sm sm:text-base h-10 sm:h-12 sm:min-px-5 w-40 sm:w-40 relative group"
       type="text"
       placeholder="Validate Ticket"
+      value={validatedTicket}
       onChange={updateValidatedTicket}
       onKeyDown={validateTicket}
     />
@@ -94,16 +95,15 @@ export default function Ticket() {
   };
 
   const cancelTicket = (event) => {
-    if (event.key === 'Enter' && cancelledTicket.trim() !== '') {
-      const ticketID = parseFloat(cancelledTicket);
-      if (!isNaN(ticketID) && Number.isInteger(ticketID) && ticketID >= 0) {
-        console.log('Cancel Ticket ID %d', ticketID);
+    if (event.key === "Enter") {
+      if (/^[0-9]+$/.test(cancelledTicket)) {
+        console.log("Cancel Ticket ID %d", parseInt(cancelledTicket));
+        setCancelledTicket("");
+        // cancelOnChain();
       } else {
-        alert('Please enter a valid Ticket ID.');
+        alert(INVALID_TICKET_ID_MSG);
       }
-      setCancelledTicket('');
     }
-    // cancelOnChain();
   };
 
   const cancelTicketInput = (
@@ -111,6 +111,7 @@ export default function Ticket() {
       className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#FFDAC8] text-sm sm:text-base h-10 sm:h-12 sm:min-px-5 w-40 sm:w-40 relative group"
       type="text"
       placeholder="Cancel Ticket"
+      value={cancelledTicket}
       onChange={updateCancelledTicket}
       onKeyDown={cancelTicket}
     />
