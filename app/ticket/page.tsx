@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAddress, useWeb3Auth } from "../context";
-// import { useAddress, useWeb3Auth, useTicketNFT } from "../context";
+import { useAddress, useWeb3Auth, useTicketNFT } from "../context";
 
 export default function Ticket() {
   const router = useRouter();
@@ -11,8 +10,10 @@ export default function Ticket() {
   const [cancelledTicket, setCancelledTicket] = useState("");
   const { setAddress } = useAddress();
   const { web3Auth } = useWeb3Auth();
-  const INVALID_TICKET_ID_MSG = "Ticket ID should be a nonnegative integer.";
+  const ticketID_pattern = /^[0-9]{4}$/;
+  const invalid_ticketID_msg = "Ticket ID should be a 4-digit number.";
   // const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
+  const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
 
   useEffect(() => {
     if (!web3Auth) {
@@ -50,7 +51,7 @@ export default function Ticket() {
 
   const buyTicket = async () => {
     console.log("Buy Ticket");
-    // await buyOnChain();
+    await buyOnChain();
   };
 
   const buyTicketButton = (
@@ -69,14 +70,15 @@ export default function Ticket() {
 
   const validateTicket = (event) => {
     if (event.key === "Enter") {
-      if (/^[0-9]+$/.test(validatedTicket)) {
-        console.log("Validate Ticket ID %d", parseInt(validatedTicket));
+      if (ticketID_pattern.test(validatedTicket)) {
+        const ticketID = parseInt(validatedTicket);
+        console.log("Validate Ticket ID %d", ticketID);
+        validateOnChain(ticketID);
         setValidatedTicket("");
-        // validateOnChain();
       } else {
-        alert(INVALID_TICKET_ID_MSG);
-      }
-    }
+        alert(invalid_ticketID_msg);
+      };
+    };
   };
 
   const validateTicketInput = (
@@ -96,14 +98,15 @@ export default function Ticket() {
 
   const cancelTicket = (event) => {
     if (event.key === "Enter") {
-      if (/^[0-9]+$/.test(cancelledTicket)) {
-        console.log("Cancel Ticket ID %d", parseInt(cancelledTicket));
+      if (ticketID_pattern.test(cancelledTicket)) {
+        const ticketID = parseInt(cancelledTicket);
+        console.log("Cancel Ticket ID %d", ticketID);
+        cancelOnChain(ticketID);
         setCancelledTicket("");
-        // cancelOnChain();
       } else {
-        alert(INVALID_TICKET_ID_MSG);
-      }
-    }
+        alert(invalid_ticketID_msg);
+      };
+    };
   };
 
   const cancelTicketInput = (
