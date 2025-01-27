@@ -45,20 +45,20 @@ $ forge snapshot
 $ anvil
 ```
 
-### Deploy
+### Deploy & Verify
 
 ```shell
 $ source ../.env
 $ forge script \
     --broadcast \
     --verify \
-    --rpc-url ${ARB_SEPOLIA_RPC_URL} \
-    --etherscan-api-key ${ARBISCAN_API_KEY} \
-    --private-key ${PRIVATE_KEY}
+    --rpc-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
+    --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
+    --private-key ${NEXT_PUBLIC_PRIVATE_KEY}
     script/ticketNFT.s.sol:TicketNFTScript
 ```
 
-### Verify
+### Verify Deployed Contract
 
 ```shell
 $ source ../.env
@@ -67,8 +67,8 @@ $ forge verify-contract \
     --num-of-optimizations 1000000 \
     --watch \
     --constructor-args $(cast abi-encode "constructor()") \
-    --etherscan-api-key ${ARBISCAN_API_KEY} \
-    ${CONTRACT_ADDRESS} \
+    --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
+    ${NEXT_PUBLIC_CONTRACT_ADDRESS} \
     src/ticketNFT.sol:TicketNFT
 ```
 
