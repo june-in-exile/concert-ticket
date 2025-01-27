@@ -66,7 +66,6 @@ $ forge script \
     script/ticketNFT.deploy.sol:TicketNFTScript
 ```
 
-
 ### Deploy to Arbitrum Sepolia & Verify Automatically
 
 ```shell
