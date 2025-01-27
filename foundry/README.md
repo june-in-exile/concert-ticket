@@ -45,7 +45,29 @@ $ forge snapshot
 $ anvil
 ```
 
-### Deploy & Verify
+### Deploy to Anvil
+
+```shell
+$ source ../.env
+$ forge script \
+    --broadcast \
+    --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
+    --private-key ${NEXT_PUBLIC_PRIVATE_KEY}
+    script/ticketNFT.deploy.sol:TicketNFTScript
+
+$ forge script \
+    --fork-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
+    --broadcast \
+    script/ticketNFT.deploy.sol:TicketNFTScript
+
+$ forge script \
+    --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
+    --broadcast \
+    script/ticketNFT.deploy.sol:TicketNFTScript
+```
+
+
+### Deploy to Arbitrum Sepolia & Verify Automatically
 
 ```shell
 $ source ../.env
@@ -55,10 +77,10 @@ $ forge script \
     --rpc-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
     --private-key ${NEXT_PUBLIC_PRIVATE_KEY}
-    script/ticketNFT.s.sol:TicketNFTScript
+    script/ticketNFT.deploy.sol:TicketNFTScript
 ```
 
-### Verify Deployed Contract
+### Verify Deployed Contract on Arbitrum Sepolia
 
 ```shell
 $ source ../.env

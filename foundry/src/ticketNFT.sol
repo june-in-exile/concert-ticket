@@ -8,7 +8,9 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
     uint256 private nextTokenId;
     mapping(uint256 => bool) private validTickets;
 
-    constructor() ERC721("TicketNFT", "TNFT") {}
+    constructor() ERC721("TicketNFT", "TNFT") {
+        nextTokenId = 1;
+    }
 
     function buyTicket() external {
         uint256 tokenId = nextTokenId;
@@ -33,8 +35,8 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
         uint256[] memory ownedTickets = new uint256[](tokenCount);
         uint256 currentIndex = 0;
 
-        for (uint256 i = 0; i < nextTokenId; i++) {
-            if (ownerOf(i) == msg.sender) {
+        for (uint256 i = 1; i < nextTokenId; i++) {
+            if (ownerOf(i) == msg.sender && validTickets[i]) {
                 ownedTickets[currentIndex] = i;
                 currentIndex++;
             }
