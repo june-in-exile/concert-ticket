@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { Address } from "./address";
 import { Provider } from "./provider";
 import { Web3Auth } from "./web3Auth";
-import { TicketNFT } from "./contract/ticketNFT";
+import { TicketNFT } from "./ticketNFT";
 
 export const Context = ({ children }: { children: ReactNode }) => {
   return (

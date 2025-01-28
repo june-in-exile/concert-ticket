@@ -1,24 +1,22 @@
 "use client";
 import React, { createContext, useContext } from "react";
-import ticketNFT from "./TicketNFT.json";
+import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 import { ethers } from "ethers";
-import { privateKey, rpcUrl, contractAddress } from "../../constant";
+import { privateKey, rpcUrl, contractAddress } from "../constant";
 
 const TicketNFTContext = createContext(null);
 
+const provider = new ethers.JsonRpcProvider(rpcUrl);
+const signer = new ethers.Wallet(privateKey, provider);
+const contract = new ethers.Contract(contractAddress, ticketNFT.abi, signer);
+
+console.log("privateKey = ", privateKey);
+console.log("rpcUrl = ", rpcUrl);
+console.log("contractAddress = ", contractAddress);
+
 export const TicketNFT = ({ children }) => {
   const buyOnChain = async () => {
-    console.log("privateKey = ", privateKey);
-    console.log("rpcUrl = ", rpcUrl);
-    console.log("contractAddress = ", contractAddress);
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const signer = new ethers.Wallet(privateKey, provider);
-    const contractWithSigner = new ethers.Contract(
-      contractAddress,
-      ticketNFT.abi,
-      signer,
-    );
-    await contractWithSigner
+    await contract
       .buyTicket()
       .then((transaction) => {
         console.log("Transaction Mined", transaction);
@@ -29,13 +27,7 @@ export const TicketNFT = ({ children }) => {
   };
 
   const validateOnChain = async (ticketId: number) => {
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const contractWithProvider = new ethers.Contract(
-      contractAddress,
-      ticketNFT.abi,
-      provider,
-    );
-    await contractWithProvider
+    await contract
       .isTicketValid(ticketId)
       .then((isValid) => {
         console.log("isValid = ", isValid);
@@ -47,14 +39,7 @@ export const TicketNFT = ({ children }) => {
   };
 
   const cancelOnChain = async (ticketId: number) => {
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const signer = new ethers.Wallet(privateKey, provider);
-    const contractWithSigner = new ethers.Contract(
-      contractAddress,
-      ticketNFT.abi,
-      signer,
-    );
-    await contractWithSigner
+    await contract
       .cancelTicket(ticketId)
       .then((transaction) => {
         console.log("Transaction Mined", transaction);

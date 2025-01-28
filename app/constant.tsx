@@ -21,7 +21,8 @@ if (envChain === "ARB_SEPOLIA") {
 export { chain, privateKey, rpcUrl, contractAddress };
 
 export const ticketID_pattern = /^(?!0000)\d{4}$/;
-export const invalid_ticketID_msg = "Ticket ID should be a nonzero 4-digit number.";
+export const invalid_ticketID_msg =
+  "Ticket ID should be a nonzero 4-digit number.";
 
 export const w3a_clientId =
   "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from https://dashboard.web3auth.io

@@ -41,7 +41,6 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
                 currentIndex++;
             }
         }
-
         return ownedTickets;
     }
 }
