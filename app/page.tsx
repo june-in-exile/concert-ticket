@@ -19,6 +19,7 @@ export default function Home() {
   const { address, setAddress } = useAddress();
   const { provider, setProvider } = useProvider();
   const { web3Auth, setWeb3Auth } = useWeb3Auth();
+  console.error("chain = ", chain);
 
   useEffect(() => {
     const init = async () => {

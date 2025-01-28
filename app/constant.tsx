@@ -8,13 +8,13 @@ let rpcUrl: string;
 let contractAddress: `0x${string}`;
 
 if (envChain === "ARB_SEPOLIA") {
-  chain = sepolia!;
+  chain = sepolia;
   privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY;
   rpcUrl = process.env.NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL;
   contractAddress = process.env
     .NEXT_PUBLIC_ARB_SEPOLIA_CONTRACT_ADDRESS as `0x${string}`;
 } else {
-  chain = localhost!;
+  chain = localhost;
   privateKey = process.env.NEXT_PUBLIC_ANVIL_PRIVATE_KEY;
   rpcUrl = process.env.NEXT_PUBLIC_ANVIL_RPC_URL;
   contractAddress = process.env

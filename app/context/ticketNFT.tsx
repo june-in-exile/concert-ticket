@@ -25,7 +25,6 @@ export const TicketNFT = ({ children }) => {
       const privateKey = await provider.request({
         method: "eth_private_key",
       });
-      console.error("privateKey = ", privateKey);
       const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
       const signer = new ethers.Wallet(privateKey, rpcProvider);
       setContract(new ethers.Contract(contractAddress, ticketNFT.abi, signer));
