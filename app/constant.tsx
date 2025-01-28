@@ -11,12 +11,14 @@ if (envChain === "ARB_SEPOLIA") {
   chain = sepolia!;
   privateKey = process.env.NEXT_PUBLIC_PRIVATE_KEY;
   rpcUrl = process.env.NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL;
-  contractAddress = process.env.NEXT_PUBLIC_ARB_SEPOLIA_CONTRACT_ADDRESS as `0x${string}`;
+  contractAddress = process.env
+    .NEXT_PUBLIC_ARB_SEPOLIA_CONTRACT_ADDRESS as `0x${string}`;
 } else {
   chain = localhost!;
   privateKey = process.env.NEXT_PUBLIC_ANVIL_PRIVATE_KEY;
   rpcUrl = process.env.NEXT_PUBLIC_ANVIL_RPC_URL;
-  contractAddress = process.env.NEXT_PUBLIC_ANVIL_CONTRACT_ADDRESS as `0x${string}`;
+  contractAddress = process.env
+    .NEXT_PUBLIC_ANVIL_CONTRACT_ADDRESS as `0x${string}`;
 }
 export { chain, privateKey, rpcUrl, contractAddress };
 

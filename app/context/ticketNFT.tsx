@@ -19,11 +19,11 @@ export const TicketNFT = ({ children }) => {
         return;
       }
       if (!provider) {
-        console.log("provider not initialized yet")
+        console.log("provider not initialized yet");
         return;
       }
       const privateKey = await provider.request({
-        method: "eth_private_key"
+        method: "eth_private_key",
       });
       console.error("privateKey = ", privateKey);
       const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
@@ -39,7 +39,7 @@ export const TicketNFT = ({ children }) => {
       console.log("Transaction Mined", transaction);
     } catch (error) {
       console.error(error);
-    };
+    }
   };
 
   const validateOnChain = async (ticketId: number) => {
@@ -47,7 +47,7 @@ export const TicketNFT = ({ children }) => {
       return await contract.isTicketValid(ticketId);
     } catch (error) {
       console.error(error);
-    };
+    }
   };
 
   const cancelOnChain = async (ticketId: number) => {
@@ -56,7 +56,7 @@ export const TicketNFT = ({ children }) => {
       console.log("Transaction Mined", transaction);
     } catch (error) {
       console.error(error);
-    };
+    }
   };
 
   return (
