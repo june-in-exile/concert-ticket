@@ -76,17 +76,15 @@ export default function Ticket() {
       if (ticketID_pattern.test(validatedTicket)) {
         const ticketID = parseInt(validatedTicket);
         console.log("Validate Ticket ID %d", ticketID);
-        await validateOnChain(ticketID)
-          .then((isValid: boolean) => {
-            if (isValid) {
-              console.log("Ticket %d is valid.", ticketID);
-            } else {
-              console.log("Ticket %d is not valid.", ticketID);
-            }
-          })
-          .catch((error) => {
-            console.error("Error while validating ticket:", error);
-          });
+        try {
+          if (await validateOnChain(ticketID)) {
+            console.log(`Ticket ${ticketID} is valid.`);
+          } else {
+            console.log(`Ticket ${ticketID} is not valid.`);
+          }
+        } catch (error) {
+          console.error(`Error while validating ticket:`, error);
+        }
         setValidatedTicket("");
       } else {
         alert(invalid_ticketID_msg);
