@@ -50,18 +50,8 @@ $ anvil
 ```shell
 $ source ../.env
 $ forge script \
-    --broadcast \
     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
-    --private-key ${NEXT_PUBLIC_PRIVATE_KEY}
-    script/ticketNFT.deploy.sol:TicketNFTScript
-
-$ forge script \
-    --fork-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
-    --broadcast \
-    script/ticketNFT.deploy.sol:TicketNFTScript
-
-$ forge script \
-    --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
+    --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} \
     --broadcast \
     script/ticketNFT.deploy.sol:TicketNFTScript
 ```
@@ -89,7 +79,7 @@ $ forge verify-contract \
     --watch \
     --constructor-args $(cast abi-encode "constructor()") \
     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
-    ${NEXT_PUBLIC_CONTRACT_ADDRESS} \
+    ${NEXT_PUBLIC_ARB_SEPOLIA_CONTRACT_ADDRESS} \
     src/ticketNFT.sol:TicketNFT
 ```
 

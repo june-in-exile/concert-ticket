@@ -2,12 +2,15 @@
 import React, { createContext, useContext } from "react";
 import ticketNFT from "./TicketNFT.json";
 import { ethers } from "ethers";
-import { privateKey, contractAddress, rpcUrl } from "../../constant";
+import { privateKey, rpcUrl, contractAddress } from "../../constant";
 
 const TicketNFTContext = createContext(null);
 
 export const TicketNFT = ({ children }) => {
   const buyOnChain = async () => {
+    console.log("privateKey = ", privateKey);
+    console.log("rpcUrl = ", rpcUrl);
+    console.log("contractAddress = ", contractAddress);
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const signer = new ethers.Wallet(privateKey, provider);
     const contractWithSigner = new ethers.Contract(

@@ -6,7 +6,9 @@ Introduction of the project: https://nft-ybf2u74.gamma.site/.
 
 ## Getting Started
 
-First, run the development server:
+First, deploy the contract according to the guides in `/foundry`.
+
+Then, run the development server:
 
 ```bash
 npm run dev

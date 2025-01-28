@@ -9,18 +9,18 @@ export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
-  const { setAddress } = useAddress();
+  const { address, setAddress } = useAddress();
   const { web3Auth } = useWeb3Auth();
   const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
 
   useEffect(() => {
     if (!web3Auth) {
-      console.log("web3auth not initialized yet");
+      console.error("web3auth not initialized yet");
       router.push(`/`);
       return;
     }
     if (!web3Auth.connected) {
-      console.log("web3Auth not connected yet");
+      console.error("web3Auth not connected yet");
       router.push(`/`);
       return;
     }
@@ -28,7 +28,7 @@ export default function Ticket() {
 
   const logout = async () => {
     if (!web3Auth) {
-      console.log("web3auth not initialized yet");
+      console.error("web3auth not initialized yet");
       return;
     }
     await web3Auth.logout();
