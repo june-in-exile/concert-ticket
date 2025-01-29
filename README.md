@@ -4,7 +4,7 @@
 
 Copy `.env.example` as `.env` and change the values to yours.
 
-``` bash
+```bash
 cp .env.example .env
 ```
 
@@ -21,13 +21,13 @@ $ cd foundry \
 
 First, start a local node:
 
-``` bash
+```bash
 $ anvil
 ```
 
 Then, in a new terminal, follow these steps to deploy the contract:
 
-``` bash
+```bash
 $ source .env \
     && cd foundry \
     && forge script \
@@ -39,7 +39,7 @@ $ source .env \
 
 ## 2-2. Deploy on Test Network (Arbitrum Sepolia)
 
-``` bash
+```bash
 $ source .env \
     && cd foundry \
     && forge script \

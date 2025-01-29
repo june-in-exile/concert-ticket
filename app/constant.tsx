@@ -1,6 +1,7 @@
+"use client";
 import { sepolia, localhost } from "viem/chains";
 
-const envChain = process.env.CHAIN as "ARB_SEPOLIA" | "ANVIL";
+const envChain = process.env.NEXT_PUBLIC_CHAIN as "ARB_SEPOLIA" | "ANVIL";
 
 let chain;
 let privateKey: string;
