@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAddress, useProvider, useWeb3Auth } from "./context";
+import { useAddress, useProvider, useWeb3Auth, useLoggedIn } from "./context";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import {
   WALLET_ADAPTERS,
@@ -17,22 +17,23 @@ import {
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { createWalletClient, custom } from "viem";
 import { chain, arb_sepolia_usdc, arb_sepolia_chainId, pimlico_api_key, w3a_clientId, google_clientId } from "./constant";
+import RPC from './viemRPC' // for using viem
 
 export default function Home() {
   const router = useRouter();
   const { address, setAddress } = useAddress();
   const { provider, setProvider } = useProvider();
   const { web3Auth, setWeb3Auth } = useWeb3Auth();
+  const { loggedIn, setLoggedIn } = useLoggedIn();
+
 
   useEffect(() => {
     const init = async () => {
       try {
         const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
-          chainId: "0xaa36a7", // for wallet connect make sure to pass in this chain in the loginSettings of the adapter.
+          chainId: "0xaa36a7", // Please use 0x1 for Mainnet
           rpcTarget: "https://rpc.ankr.com/eth_sepolia",
-          // Avoid using public rpcTarget in production.
-          // Use services like Infura, Quicknode etc
           displayName: "Ethereum Sepolia Testnet",
           blockExplorerUrl: "https://sepolia.etherscan.io",
           ticker: "ETH",
@@ -40,33 +41,14 @@ export default function Home() {
           logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
         };
 
-        const privateKeyProvider = new EthereumPrivateKeyProvider({
-          config: { chainConfig },
-        });
-
-        const accountAbstractionProvider = new AccountAbstractionProvider({
-          config: {
-            chainConfig,
-            bundlerConfig: {
-              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-              paymasterContext: {
-                token: arb_sepolia_usdc,
-              },
-            },
-            smartAccountInit: new SafeSmartAccount(),
-            paymasterConfig: {
-              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-            },
-          },
-        });
+        const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
 
         const web3AuthInstance = new Web3AuthNoModal({
           clientId: w3a_clientId,
           web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           privateKeyProvider,
-          // accountAbstractionProvider,
-          useAAWithExternalWallet: false,
         });
+
 
         const authAdapter = new AuthAdapter({
           adapterSettings: {
@@ -79,26 +61,26 @@ export default function Home() {
               defaultLanguage: "en", // en, de, ja, ko, zh, es, fr, pt, nl
               mode: "dark", // whether to enable dark mode. defaultValue: auto
               theme: {
-                primary: "#010101",
+                primary: "#001111",
               },
             },
             loginConfig: {
               google: {
-                verifier: "google-concert-ticket",
+                verifier: "w3a-google-demo",
                 typeOfLogin: "google",
-                clientId: google_clientId, // get from https://console.developers.google.com/
+                clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com", //use your app client id you got from google
               },
             },
           },
         });
-
         web3AuthInstance.configureAdapter(authAdapter);
-        await setWeb3Auth(web3AuthInstance);
+        setWeb3Auth(web3AuthInstance);
 
         await web3AuthInstance.init();
-        await setProvider(web3AuthInstance.provider);
+        setProvider(web3AuthInstance.provider);
 
         if (web3AuthInstance.connected) {
+          setLoggedIn(true);
           console.log("web3AuthInstance connected!");
         }
       } catch (error) {
@@ -107,60 +89,35 @@ export default function Home() {
     };
 
     init();
-  }, [setProvider, setWeb3Auth]);
+  }, []);
 
   useEffect(() => {
-    if (!web3Auth) {
-      console.log("web3auth not initialized yet");
-      return;
+    if (loggedIn) { 
+      getAccount();
+      router.push(`/ticket`);
     }
-    if (!web3Auth.connected) {
-      console.log("web3Auth not connected yet");
-      return;
-    }
+
+  }, [router, loggedIn]);
+
+  const getAccount = async () => {
     if (!provider) {
       console.log("provider not initialized yet");
       return;
     }
-    const getAccount = async () => {
-      const walletClient = createWalletClient({
-        chain: chain,
-        transport: custom(provider),
-      });
-
-      const addresses = await walletClient.getAddresses();
-      // console.error("addresses = ", addresses);
-      await setAddress(addresses[0]);
-
-      router.push(`/ticket?address=${address}`);
-    };
-    getAccount();
-  }, [router, web3Auth, provider, setAddress, address]);
-
-  const getAccount = async () => {
-    const walletClient = createWalletClient({
-      chain: chain,
-      transport: custom(provider),
-    });
-
-    const addresses = await walletClient.getAddresses();
-    await setAddress(addresses[0]);
+    const rpc = new RPC(provider);
+    const address = await rpc.getAccounts();
+    console.log(address);
   };
 
   const loginWithGoogle = async () => {
     if (!web3Auth) {
-      console.log("web3auth not initialized yet");
+      console.log("web3Auth not initialized yet");
       return;
     }
-    if (web3Auth.connected) {
-      console.log("Already logged in.");
-      return;
-    }
-    await web3Auth.connectTo(WALLET_ADAPTERS.AUTH, {
+    const web3AuthProvider = await web3Auth.connectTo(WALLET_ADAPTERS.AUTH, {
       loginProvider: "google",
     });
-    await getAccount();
-    router.push(`/ticket?address=${address}`);
+    setProvider(web3AuthProvider);
   };
 
   const loginButton = (

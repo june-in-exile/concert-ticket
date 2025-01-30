@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAddress, useWeb3Auth, useTicketNFT } from "../context";
+import { useAddress, useWeb3Auth, useProvider, useLoggedIn, useTicketNFT } from "../context";
 import { ticketId_pattern, invalid_ticketId_msg } from "../constant";
 
 export default function Ticket() {
@@ -10,26 +10,16 @@ export default function Ticket() {
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
   const { setAddress } = useAddress();
+  const { setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
+  const { loggedIn, setLoggedIn } = useLoggedIn();
   const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
 
   useEffect(() => {
-    if (!web3Auth) {
-      console.log("web3auth not initialized yet");
+    if (!loggedIn) {
       router.push(`/`);
-      return;
     }
-    if (!web3Auth.connected) {
-      console.log("web3Auth not connected yet");
-      router.push(`/`);
-      return;
-    }
-    // if (!address) {
-    //   console.log("no address available");
-    //   router.push(`/`);
-    //   return;
-    // }
-  }, [router, web3Auth]);
+  }, [router, loggedIn]);
 
   const logout = async () => {
     if (!web3Auth) {
@@ -37,9 +27,8 @@ export default function Ticket() {
       return;
     }
     await web3Auth.logout();
-    await setAddress(null);
-    router.push(`/`);
-    console.log("Logged out!");
+    setLoggedIn(false);
+    setProvider(null);
   };
 
   const logoutButton = (
