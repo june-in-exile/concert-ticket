@@ -2,14 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAddress, useWeb3Auth, useProvider, useLoggedIn, useTicketNFT } from "../context";
-import { ticketId_pattern, invalid_ticketId_msg } from "../constant";
+import {
+  useAddress,
+  useWeb3Auth,
+  useProvider,
+  useLoggedIn,
+  useTicketNFT,
+} from "../context";
+import { ticketId_pattern, address_pattern, invalid_ticketId_msg } from "../constant";
 
 export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
-  const { setAddress } = useAddress();
+  const { address, setAddress } = useAddress();
   const { setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -17,9 +23,23 @@ export default function Ticket() {
 
   useEffect(() => {
     if (!loggedIn) {
+      setAddress(null);
       router.push(`/`);
+      return;
     }
-  }, [router, loggedIn]);
+    if (!address) {
+      setLoggedIn(false);
+      setProvider(null);
+      router.push(`/`);
+      return;
+    }
+  }, [router, loggedIn, address]);
+
+  useEffect(() => {
+    if (address && !address_pattern.test(address)) {
+      setAddress(null);
+    }
+  }, [address]);
 
   const logout = async () => {
     if (!web3Auth) {

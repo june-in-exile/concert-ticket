@@ -16,8 +16,15 @@ import {
 } from "@web3auth/account-abstraction-provider";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { createWalletClient, custom } from "viem";
-import { chain, arb_sepolia_usdc, arb_sepolia_chainId, pimlico_api_key, w3a_clientId, google_clientId } from "./constant";
-import RPC from './viemRPC' // for using viem
+import {
+  chain,
+  arb_sepolia_usdc,
+  arb_sepolia_chainId,
+  pimlico_api_key,
+  w3a_clientId,
+  google_clientId,
+} from "./constant";
+import RPC from "./viemRPC"; // for using viem
 
 export default function Home() {
   const router = useRouter();
@@ -25,7 +32,6 @@ export default function Home() {
   const { provider, setProvider } = useProvider();
   const { web3Auth, setWeb3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
-
 
   useEffect(() => {
     const init = async () => {
@@ -41,14 +47,15 @@ export default function Home() {
           logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
         };
 
-        const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
+        const privateKeyProvider = new EthereumPrivateKeyProvider({
+          config: { chainConfig },
+        });
 
         const web3AuthInstance = new Web3AuthNoModal({
           clientId: w3a_clientId,
           web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           privateKeyProvider,
         });
-
 
         const authAdapter = new AuthAdapter({
           adapterSettings: {
@@ -68,7 +75,8 @@ export default function Home() {
               google: {
                 verifier: "w3a-google-demo",
                 typeOfLogin: "google",
-                clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com", //use your app client id you got from google
+                clientId:
+                  "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com", //use your app client id you got from google
               },
             },
           },
@@ -92,21 +100,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (loggedIn) { 
-      getAccount();
-      router.push(`/ticket`);
-    }
-
+    const handleLogin = async () => {
+      if (loggedIn) {
+        await pushAccount();
+      }
+    };
+    handleLogin();
   }, [router, loggedIn]);
 
-  const getAccount = async () => {
+  const pushAccount = async () => {
     if (!provider) {
       console.log("provider not initialized yet");
       return;
     }
     const rpc = new RPC(provider);
-    const address = await rpc.getAccounts();
-    console.log(address);
+    const account = await rpc.getAccounts();
+    await setAddress(account);
+    router.push(`/ticket?address=${account}`);
   };
 
   const loginWithGoogle = async () => {

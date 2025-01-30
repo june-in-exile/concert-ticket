@@ -56,7 +56,7 @@ $ cd foundry \
 >     script/ticketNFT.deploy.sol:TicketNFTScript
 > ```
 
-Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment and run
+Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment and choose the corresponding `NEXT_PUBLIC_CHAIN`. Then, run
 
 ```bash
 $ source .env

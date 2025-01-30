@@ -4,6 +4,7 @@ import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 import { ethers } from "ethers";
 import { rpcUrl, contract_address } from "../constant";
 import { useWeb3Auth, useProvider } from "./index";
+import RPC from '.././viemRPC' // for using viem
 
 const TicketNFTContext = createContext(null);
 
@@ -14,17 +15,12 @@ export const TicketNFT = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
-      if (!web3Auth) {
-        console.log("web3auth not initialized yet");
-        return;
-      }
       if (!provider) {
         console.log("provider not initialized yet");
         return;
       }
-      const privateKey = await provider.request({
-        method: "eth_private_key",
-      });
+      const rpc = new RPC(provider);
+      const privateKey = await rpc.getPrivateKey();
       const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
       const signer = new ethers.Wallet(privateKey, rpcProvider);
       setContract(new ethers.Contract(contract_address, ticketNFT.abi, signer));
