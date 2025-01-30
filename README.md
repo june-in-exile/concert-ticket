@@ -5,58 +5,93 @@
 Copy `.env.example` as `.env` and change the values to yours.
 
 ```bash
-cp .env.example .env
+$ cp .env.example .env
+$ source .env
 ```
 
-Note that in the first line of `.env` you can choose which chain you would like to use. (default to "ANVIL")
+Note that in the first line of `.env` you can choose which chain you would like to use (default to "ANVIL", which is for local testing).
 
-## 2. Build
+## 2. Fork Arbitrum Sepolia
+
+*(This step is required only for local testing.)*
+
+```bash
+$ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}
+```
+
+## 3. Build & Deploy
+
+*(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already filled.)*
+
+Build.
 
 ```
 $ cd foundry \
     && forge build
 ```
 
-## 2-1. Deploy Locally (Anvil)
+> ### 3-1. Deploy on Arbitrum Sepolia
+> 
+> ```bash
+> $ cd foundry \
+>     && forge script \
+>     --broadcast \
+>     --verify \
+>     --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
+>     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
+>     --private-key ${NEXT_PUBLIC_PRIVATE_KEY} \
+>     script/ticketNFT.deploy.sol:TicketNFTScript
+> ```
+>
+> 
+> ### 3-2. Deploy on Forked Arbitrum Sepolia
+>
+> 
+> ```bash
+> $ cd foundry \
+>     && forge script \
+>     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
+>     --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} \
+>     --broadcast \
+>     script/ticketNFT.deploy.sol:TicketNFTScript
+> ```
 
-First, start a local node:
+Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment and run
 
 ```bash
-$ anvil
+$ source .env
 ```
 
-Then, in a new terminal, follow these steps to deploy the contract:
+## 4. Start Frontend & Server
 
-```bash
-$ source .env \
-    && cd foundry \
-    && forge script \
-    --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
-    --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} \
-    --broadcast \
-    script/ticketNFT.deploy.sol:TicketNFTScript
-```
-
-## 2-2. Deploy on Test Network (Arbitrum Sepolia)
-
-```bash
-$ source .env \
-    && cd foundry \
-    && forge script \
-    --broadcast \
-    --verify \
-    --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
-    --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
-    --private-key ${NEXT_PUBLIC_PRIVATE_KEY} \
-    script/ticketNFT.deploy.sol:TicketNFTScript
-```
-
-## 3. Start Frontend & Server
-
-After the deployment, you can run the development server in the root:
+Run the development server:
 
 ```bash
 npm run dev
 ```
 
 and open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 5. Send Tokens on Forked Arbitrum Sepolia
+
+*(This step is required only for local testing.)*
+
+After logging, fill the `NEXT_PUBLIC_GMAIL_ACCOUNT` field in `.env` with your account created through Gmail (which you can get from the URL) and run
+
+```bash
+$ source .env
+```
+
+Send 1 ETH to your account created through Gmail:
+
+```bash
+$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_GMAIL_ACCOUNT} --value 1ether \
+    && cast balance ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+```
+
+Or send 10 USDC:
+
+```bash
+$ cast rpc anvil_impersonateAccount ${NEXT_PUBLIC_ANVIL_ALICE} \
+    && cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+```

@@ -51,7 +51,7 @@ $ anvil
 $ source ../.env
 $ forge script \
     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
-    --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} \
+    --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} \
     --broadcast \
     script/ticketNFT.deploy.sol:TicketNFTScript
 ```
@@ -74,7 +74,7 @@ $ forge script \
 ```shell
 $ source ../.env
 $ forge verify-contract \
-    --chain-id 421614 \
+    --chain-id ${NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID} \
     --num-of-optimizations 1000000 \
     --watch \
     --constructor-args $(cast abi-encode "constructor()") \

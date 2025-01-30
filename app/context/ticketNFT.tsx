@@ -2,7 +2,7 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
 import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 import { ethers } from "ethers";
-import { rpcUrl, contractAddress } from "../constant";
+import { rpcUrl, contract_address } from "../constant";
 import { useWeb3Auth, useProvider } from "./index";
 
 const TicketNFTContext = createContext(null);
@@ -27,7 +27,7 @@ export const TicketNFT = ({ children }) => {
       });
       const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
       const signer = new ethers.Wallet(privateKey, rpcProvider);
-      setContract(new ethers.Contract(contractAddress, ticketNFT.abi, signer));
+      setContract(new ethers.Contract(contract_address, ticketNFT.abi, signer));
     };
     init();
   }, [web3Auth, provider]);

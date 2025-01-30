@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAddress, useWeb3Auth, useTicketNFT } from "../context";
-import { ticketID_pattern, invalid_ticketID_msg } from "../constant";
+import { ticketId_pattern, invalid_ticketId_msg } from "../constant";
 
 export default function Ticket() {
   const router = useRouter();
@@ -73,21 +73,21 @@ export default function Ticket() {
 
   const validateTicket = async (event) => {
     if (event.key === "Enter") {
-      if (ticketID_pattern.test(validatedTicket)) {
-        const ticketID = parseInt(validatedTicket);
-        console.log("Validate Ticket ID %d", ticketID);
+      if (ticketId_pattern.test(validatedTicket)) {
+        const ticketId = parseInt(validatedTicket);
+        console.log("Validate Ticket Id %d", ticketId);
         try {
-          if (await validateOnChain(ticketID)) {
-            console.log(`Ticket ${ticketID} is valid.`);
+          if (await validateOnChain(ticketId)) {
+            console.log(`Ticket ${ticketId} is valid.`);
           } else {
-            console.log(`Ticket ${ticketID} is not valid.`);
+            console.log(`Ticket ${ticketId} is not valid.`);
           }
         } catch (error) {
           console.error(`Error while validating ticket:`, error);
         }
         setValidatedTicket("");
       } else {
-        alert(invalid_ticketID_msg);
+        alert(invalid_ticketId_msg);
       }
     }
   };
@@ -109,15 +109,15 @@ export default function Ticket() {
 
   const cancelTicket = async (event) => {
     if (event.key === "Enter") {
-      if (ticketID_pattern.test(cancelledTicket)) {
-        const ticketID = parseInt(cancelledTicket);
-        console.log("Cancel Ticket ID %d", ticketID);
-        await cancelOnChain(ticketID).catch((error) => {
+      if (ticketId_pattern.test(cancelledTicket)) {
+        const ticketId = parseInt(cancelledTicket);
+        console.log("Cancel Ticket Id %d", ticketId);
+        await cancelOnChain(ticketId).catch((error) => {
           console.error("Error while cancelling ticket:", error);
         });
         setCancelledTicket("");
       } else {
-        alert(invalid_ticketID_msg);
+        alert(invalid_ticketId_msg);
       }
     }
   };

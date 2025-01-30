@@ -10,9 +10,13 @@ import {
   UX_MODE,
 } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
+import {
+  AccountAbstractionProvider,
+  SafeSmartAccount,
+} from "@web3auth/account-abstraction-provider";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { createWalletClient, custom } from "viem";
-import { chain, w3a_clientId, google_client_id } from "./constant";
+import { chain, arb_sepolia_usdc, arb_sepolia_chainId, pimlico_api_key, w3a_clientId, google_clientId } from "./constant";
 
 export default function Home() {
   const router = useRouter();
@@ -40,10 +44,28 @@ export default function Home() {
           config: { chainConfig },
         });
 
+        const accountAbstractionProvider = new AccountAbstractionProvider({
+          config: {
+            chainConfig,
+            bundlerConfig: {
+              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+              paymasterContext: {
+                token: arb_sepolia_usdc,
+              },
+            },
+            smartAccountInit: new SafeSmartAccount(),
+            paymasterConfig: {
+              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+            },
+          },
+        });
+
         const web3AuthInstance = new Web3AuthNoModal({
           clientId: w3a_clientId,
           web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           privateKeyProvider,
+          // accountAbstractionProvider,
+          useAAWithExternalWallet: false,
         });
 
         const authAdapter = new AuthAdapter({
@@ -64,7 +86,7 @@ export default function Home() {
               google: {
                 verifier: "google-concert-ticket",
                 typeOfLogin: "google",
-                clientId: google_client_id, // get from https://console.developers.google.com/
+                clientId: google_clientId, // get from https://console.developers.google.com/
               },
             },
           },
@@ -107,6 +129,7 @@ export default function Home() {
       });
 
       const addresses = await walletClient.getAddresses();
+      // console.error("addresses = ", addresses);
       await setAddress(addresses[0]);
 
       router.push(`/ticket?address=${address}`);
