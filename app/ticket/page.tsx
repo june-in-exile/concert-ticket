@@ -86,7 +86,7 @@ export default function Ticket() {
       return;
     }
     const rpc = new RPC(provider);
-    // this function cannot show the balance of local node
+    // this function CANNOT show the balance of local node
     setBalance(await rpc.getBalance());
   };
 
@@ -101,10 +101,11 @@ export default function Ticket() {
 
   const showTickets = async () => {
     const ticketIds = await getTicketsOnChain();
-    const firstZeroIndex = ticketIds.findIndex(
-      (ticketId: BigInt) => ticketId === BigInt(0),
-    );
-    setTickets(ticketIds.slice(0, firstZeroIndex));
+    let lastIndex = ticketIds.length - 1;
+    while (lastIndex >= 0 && ticketIds[lastIndex] === BigInt(0)) {
+      lastIndex--;
+    }
+    setTickets(ticketIds.slice(0, lastIndex + 1));
   };
 
   const ticketText = (

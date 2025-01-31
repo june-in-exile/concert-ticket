@@ -38,8 +38,6 @@ export default function Home() {
         const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.EIP155,
           chainId: "0x66eee", // Hex of 421614
-          // Avoid using public rpcTarget in production.
-          // Use services like Infura, Quicknode etc
           rpcTarget: "https://rpc.ankr.com/arbitrum_sepolia",
           displayName: "Arbitrum Sepolia Testnet",
           blockExplorerUrl: "https://sepolia.arbiscan.io/",
@@ -47,6 +45,19 @@ export default function Home() {
           tickerName: "AETH",
           logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
         };
+
+        const accountAbstractionProvider = new AccountAbstractionProvider({
+          config: {
+            chainConfig,
+            bundlerConfig: {
+              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+            },
+            smartAccountInit: new SafeSmartAccount(),
+            paymasterConfig: {
+              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+            },
+          },
+        });
 
         const privateKeyProvider = new EthereumPrivateKeyProvider({
           config: { chainConfig },
@@ -56,6 +67,7 @@ export default function Home() {
           clientId: w3a_clientId,
           web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           privateKeyProvider,
+          // accountAbstractionProvider
         });
 
         const authAdapter = new AuthAdapter({
@@ -81,6 +93,7 @@ export default function Home() {
             },
           },
         });
+
         web3AuthInstance.configureAdapter(authAdapter);
         setWeb3Auth(web3AuthInstance);
 

@@ -8,6 +8,9 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
     uint256 private nextTokenId;
     mapping(uint256 => bool) private validTickets;
 
+    event TicketBuyed(address indexed user, uint256 tokenId);
+    event TicketCanceled(address indexed user, uint256 tokenId);
+
     constructor() ERC721("TicketNFT", "TNFT") {
         nextTokenId = 1;
     }
@@ -17,12 +20,16 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
         _safeMint(msg.sender, tokenId);
         validTickets[tokenId] = true;
         nextTokenId++;
+
+        emit TicketBuyed(msg.sender, tokenId);
     }
 
     function cancelTicket(uint256 tokenId) external {
         require(ownerOf(tokenId) == msg.sender, "You are not the owner of this ticket");
         require(validTickets[tokenId], "Ticket is already invalid");
         validTickets[tokenId] = false;
+
+        emit TicketCanceled(msg.sender, tokenId);
     }
 
     function isTicketValid(uint256 tokenId) external view returns (bool) {
