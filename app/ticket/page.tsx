@@ -9,8 +9,12 @@ import {
   useLoggedIn,
   useTicketNFT,
 } from "../context";
-import { ticketId_pattern, address_pattern, invalid_ticketId_msg } from "../constant";
-import RPC from '.././viemRPC'
+import {
+  ticketId_pattern,
+  address_pattern,
+  invalid_ticketId_msg,
+} from "../constant";
+import RPC from ".././viemRPC";
 
 export default function Ticket() {
   const router = useRouter();
@@ -59,7 +63,6 @@ export default function Ticket() {
     const rpc = new RPC(provider);
     const balanceInstance = await rpc.getBalance();
     setBalance(balanceInstance);
-    console.log("Your ETH Balance: ", balanceInstance);
   };
 
   const balanceText = (

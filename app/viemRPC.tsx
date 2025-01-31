@@ -1,5 +1,11 @@
-import { createWalletClient, createPublicClient, custom, formatEther, parseEther } from 'viem'
-import { mainnet, polygonAmoy, sepolia } from 'viem/chains'
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  formatEther,
+  parseEther,
+} from "viem";
+import { arbitrumNova, arbitrumSepolia, localhost, mainnet, polygonAmoy, sepolia } from "viem/chains";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
@@ -15,29 +21,28 @@ export default class EthereumRpc {
   }
 
   getViewChain() {
-    console.log("this.provider.chainId = ", this.provider.chainId);
     switch (this.provider.chainId) {
       case "1":
         return mainnet;
       case "0x13882":
         return polygonAmoy;
+      case "0x66eee":
+        return arbitrumSepolia;
       case "0xaa36a7":
         return sepolia;
       default:
-        return mainnet;
+        return localhost;
     }
   }
 
   async getChainId(): Promise<any> {
     try {
       const walletClient = createWalletClient({
-        transport: custom(this.provider)
-      })
+        transport: custom(this.provider),
+      });
 
-      const address = await walletClient.getAddresses()
-      console.log(address)
-
-      const chainId = await walletClient.getChainId()
+      const address = await walletClient.getAddresses();
+      const chainId = await walletClient.getChainId();
       return chainId.toString();
     } catch (error) {
       return error;
@@ -48,7 +53,7 @@ export default class EthereumRpc {
     try {
       const walletClient = createWalletClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
+        transport: custom(this.provider),
       });
 
       return await walletClient.getAddresses();
@@ -59,7 +64,6 @@ export default class EthereumRpc {
 
   async getAccounts(): Promise<any> {
     try {
-
       const address = this.getAddresses();
 
       return address;
@@ -84,15 +88,10 @@ export default class EthereumRpc {
     try {
       const publicClient = createPublicClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
-      })
-
-      console.log("chain = ", this.getViewChain());
-
+        transport: custom(this.provider),
+      });
       const address = await this.getAccounts();
-      console.log("address = ", address);
       const balance = await publicClient.getBalance({ address: address[0] });
-      console.log(balance)
       return formatEther(balance);
     } catch (error) {
       return error as string;
@@ -103,12 +102,12 @@ export default class EthereumRpc {
     try {
       const publicClient = createPublicClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
-      })
+        transport: custom(this.provider),
+      });
 
       const walletClient = createWalletClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
+        transport: custom(this.provider),
       });
 
       // data for the transaction
@@ -122,7 +121,7 @@ export default class EthereumRpc {
         to: destination,
         value: amount,
       });
-      console.log(hash)
+      console.log(hash);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
       return this.toObject(receipt);
@@ -135,7 +134,7 @@ export default class EthereumRpc {
     try {
       const walletClient = createWalletClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
+        transport: custom(this.provider),
       });
 
       // data for signing
@@ -145,10 +144,10 @@ export default class EthereumRpc {
       // Sign the message
       const hash = await walletClient.signMessage({
         account: address[0],
-        message: originalMessage
+        message: originalMessage,
       });
 
-      console.log(hash)
+      console.log(hash);
 
       return hash.toString();
     } catch (error) {
@@ -160,14 +159,14 @@ export default class EthereumRpc {
     try {
       const publicClient = createPublicClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
-      })
+        transport: custom(this.provider),
+      });
 
       const number = await publicClient.readContract({
         address: "0x9554a5CC8F600F265A89511e5802945f2e8A5F5D",
         abi: this.contractABI,
-        functionName: 'retrieve'
-      })
+        functionName: "retrieve",
+      });
 
       return this.toObject(number);
     } catch (error) {
@@ -179,12 +178,12 @@ export default class EthereumRpc {
     try {
       const publicClient = createPublicClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
-      })
+        transport: custom(this.provider),
+      });
 
       const walletClient = createWalletClient({
         chain: this.getViewChain(),
-        transport: custom(this.provider)
+        transport: custom(this.provider),
       });
 
       // data for writing to the contract
@@ -192,18 +191,15 @@ export default class EthereumRpc {
       const randomNumber = Math.floor(Math.random() * 9000) + 1000;
 
       // Submit transaction to the blockchain
-      const hash = await walletClient.writeContract(
-        {
-          account: address[0],
-          address: "0x9554a5CC8F600F265A89511e5802945f2e8A5F5D",
-          abi: this.contractABI,
-          functionName: 'store',
-          args: [randomNumber]
-        }
-      )
+      const hash = await walletClient.writeContract({
+        account: address[0],
+        address: "0x9554a5CC8F600F265A89511e5802945f2e8A5F5D",
+        abi: this.contractABI,
+        functionName: "store",
+        args: [randomNumber],
+      });
 
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
 
       return this.toObject(receipt);
     } catch (error) {
@@ -213,10 +209,11 @@ export default class EthereumRpc {
 
   toObject(data: any) {
     // can't serialize a BigInt so this hack
-    return JSON.parse(JSON.stringify(data, (key, value) =>
-      typeof value === 'bigint'
-        ? value.toString()
-        : value // return everything else unchanged
-    ));
+    return JSON.parse(
+      JSON.stringify(
+        data,
+        (key, value) => (typeof value === "bigint" ? value.toString() : value), // return everything else unchanged
+      ),
+    );
   }
 }

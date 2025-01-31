@@ -85,13 +85,23 @@ $ source .env
 Send 1 ETH to your account created through Gmail:
 
 ```bash
-$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_GMAIL_ACCOUNT} --value 1ether \
-    && cast balance ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_GMAIL_ACCOUNT} --value 1ether
 ```
 
-Or send 10 USDC:
+Check your ETH balance:
 
 ```bash
-$ cast rpc anvil_impersonateAccount ${NEXT_PUBLIC_ANVIL_ALICE} \
-    && cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+$ cast balance ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+```
+
+Send 10 USDC:
+
+```bash
+$ cast rpc anvil_impersonateAccount ${NEXT_PUBLIC_ANVIL_ALICE}
+```
+
+Check your USDC balance:
+
+```bash
+$ cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_GMAIL_ACCOUNT}
 ```
