@@ -13,7 +13,7 @@ Note that in the first line of `.env` you can choose which chain you would like 
 
 ## 2. Fork Arbitrum Sepolia
 
-*(This step is required only for local testing.)*
+_(This step is required only for local testing.)_
 
 ```bash
 $ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}
@@ -21,7 +21,7 @@ $ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}
 
 ## 3. Build & Deploy
 
-*(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already filled.)*
+_(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already filled.)_
 
 Build.
 
@@ -31,7 +31,7 @@ $ cd foundry \
 ```
 
 > ### 3-1. Deploy on Arbitrum Sepolia
-> 
+>
 > ```bash
 > $ cd foundry \
 >     && forge script \
@@ -43,10 +43,8 @@ $ cd foundry \
 >     script/ticketNFT.deploy.sol:TicketNFTScript
 > ```
 >
-> 
 > ### 3-2. Deploy on Forked Arbitrum Sepolia
 >
-> 
 > ```bash
 > $ cd foundry \
 >     && forge script \
@@ -74,7 +72,7 @@ and open [http://localhost:3000](http://localhost:3000) with your browser to see
 
 ## 5. Send Tokens on Forked Arbitrum Sepolia
 
-*(This step is required only for local testing.)*
+_(This step is required only for local testing.)_
 
 After logging, fill the `NEXT_PUBLIC_GMAIL_ACCOUNT` field in `.env` with your account created through Gmail (which you can get from the URL) and run
 

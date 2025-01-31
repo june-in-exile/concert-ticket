@@ -5,7 +5,14 @@ import {
   formatEther,
   parseEther,
 } from "viem";
-import { arbitrumNova, arbitrumSepolia, localhost, mainnet, polygonAmoy, sepolia } from "viem/chains";
+import {
+  arbitrumNova,
+  arbitrumSepolia,
+  localhost,
+  mainnet,
+  polygonAmoy,
+  sepolia,
+} from "viem/chains";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";

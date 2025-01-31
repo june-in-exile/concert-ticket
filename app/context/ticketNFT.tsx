@@ -54,9 +54,17 @@ export const TicketNFT = ({ children }) => {
     }
   };
 
+  const getTicketsOnChain = async () => {
+    try {
+      return await contract.getMyTickets();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <TicketNFTContext.Provider
-      value={{ buyOnChain, validateOnChain, cancelOnChain }}
+      value={{ buyOnChain, validateOnChain, cancelOnChain, getTicketsOnChain }}
     >
       {children}
     </TicketNFTContext.Provider>

@@ -21,16 +21,18 @@ export default function Ticket() {
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
   const [balance, setBalance] = useState("");
+  const [tickets, setTickets] = useState<BigInt[]>([]);
   const { address, setAddress } = useAddress();
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
-  const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
+  const { buyOnChain, validateOnChain, cancelOnChain, getTicketsOnChain } = useTicketNFT();
 
   useEffect(() => {
     const init = async () => {
       try {
-        await showBalance();
+        showBalance();
+        showTickets();
       } catch (error) {
         console.error(error);
       }
@@ -61,6 +63,7 @@ export default function Ticket() {
 
   const showBalance = async () => {
     const rpc = new RPC(provider);
+    // this function cannot show the balance of local node
     const balanceInstance = await rpc.getBalance();
     setBalance(balanceInstance);
   };
@@ -68,18 +71,24 @@ export default function Ticket() {
   const balanceText = (
     <p
       id="balance"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-5 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
     >
       Your ETH Balance: {balance}
     </p>
   );
 
+  const showTickets = async () => {
+    const ticketIds = await getTicketsOnChain();
+    const firstZeroIndex = ticketIds.findIndex((ticketId) => ticketId === BigInt(0));
+    setTickets(ticketIds.slice(0, firstZeroIndex));
+  };
+
   const ticketText = (
     <p
       id="ticket"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-5 right-12 m-6 text-2xl"
     >
-      Your Tickets: 1, 2, 3, 4...
+      Your Tickets: {tickets.join(', ')}
     </p>
   );
 
@@ -106,7 +115,7 @@ export default function Ticket() {
   const buyTicket = async () => {
     console.log("Buy Ticket");
     await buyOnChain();
-    await showBalance();
+    await Promise.all([showBalance(), showTickets()]);
   };
 
   const buyTicketButton = (
@@ -168,7 +177,7 @@ export default function Ticket() {
           console.error("Error while cancelling ticket:", error);
         });
         setCancelledTicket("");
-        await showBalance();
+        await Promise.all([showBalance(), showTickets()]);
       } else {
         alert(invalid_ticketId_msg);
       }
