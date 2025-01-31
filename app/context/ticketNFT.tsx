@@ -4,7 +4,7 @@ import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 import { ethers } from "ethers";
 import { rpcUrl, contract_address } from "../constant";
 import { useWeb3Auth, useProvider } from "./index";
-import RPC from '.././viemRPC' // for using viem
+import RPC from '.././viemRPC'
 
 const TicketNFTContext = createContext(null);
 

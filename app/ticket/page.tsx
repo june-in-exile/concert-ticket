@@ -10,16 +10,30 @@ import {
   useTicketNFT,
 } from "../context";
 import { ticketId_pattern, address_pattern, invalid_ticketId_msg } from "../constant";
+import RPC from '.././viemRPC'
 
 export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
+  const [balance, setBalance] = useState("");
   const { address, setAddress } = useAddress();
-  const { setProvider } = useProvider();
+  const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
   const { buyOnChain, validateOnChain, cancelOnChain } = useTicketNFT();
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await showBalance();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    init();
+  }, []);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -40,6 +54,31 @@ export default function Ticket() {
       setAddress(null);
     }
   }, [address]);
+
+  const showBalance = async () => {
+    const rpc = new RPC(provider);
+    const balanceInstance = await rpc.getBalance();
+    setBalance(balanceInstance);
+    console.log("Your ETH Balance: ", balanceInstance);
+  };
+
+  const balanceText = (
+    <p
+      id="balance"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-5 right-12 m-6 text-2xl"
+    >
+      Your ETH Balance: {balance}
+    </p>
+  );
+
+  const ticketText = (
+    <p
+      id="ticket"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
+    >
+      Your Tickets: 1, 2, 3, 4...
+    </p>
+  );
 
   const logout = async () => {
     if (!web3Auth) {
@@ -64,6 +103,7 @@ export default function Ticket() {
   const buyTicket = async () => {
     console.log("Buy Ticket");
     await buyOnChain();
+    await showBalance();
   };
 
   const buyTicketButton = (
@@ -125,6 +165,7 @@ export default function Ticket() {
           console.error("Error while cancelling ticket:", error);
         });
         setCancelledTicket("");
+        await showBalance();
       } else {
         alert(invalid_ticketId_msg);
       }
@@ -148,6 +189,8 @@ export default function Ticket() {
       {buyTicketButton} {/* center top */}
       {validateTicketInput} {/* center center */}
       {cancelTicketInput} {/* center bottom */}
+      {balanceText} {/* bottom right top */}
+      {ticketText} {/* bottom right bottom */}
     </div>
   );
 }

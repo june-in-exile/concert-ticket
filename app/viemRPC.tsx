@@ -3,45 +3,19 @@ import { mainnet, polygonAmoy, sepolia } from 'viem/chains'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
-
+import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
 
 export default class EthereumRpc {
   private provider: IProvider;
 
-  private contractABI = [
-    {
-      "inputs": [],
-      "name": "retrieve",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "num",
-          "type": "uint256"
-        }
-      ],
-      "name": "store",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ];
+  private contractABI = ticketNFT.abi;
 
   constructor(provider: IProvider) {
     this.provider = provider;
   }
 
   getViewChain() {
+    console.log("this.provider.chainId = ", this.provider.chainId);
     switch (this.provider.chainId) {
       case "1":
         return mainnet;
@@ -82,6 +56,7 @@ export default class EthereumRpc {
       return error;
     }
   }
+
   async getAccounts(): Promise<any> {
     try {
 
@@ -112,7 +87,10 @@ export default class EthereumRpc {
         transport: custom(this.provider)
       })
 
+      console.log("chain = ", this.getViewChain());
+
       const address = await this.getAccounts();
+      console.log("address = ", address);
       const balance = await publicClient.getBalance({ address: address[0] });
       console.log(balance)
       return formatEther(balance);
@@ -146,15 +124,6 @@ export default class EthereumRpc {
       });
       console.log(hash)
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-      // walletClient.writeContract({
-      //   account: address[0],
-      //   address: destination,
-      //   abi: this.contractABI,
-      //   functionName: 'functionNmae',
-      //   args: [/**/],
-      // })
-
 
       return this.toObject(receipt);
     } catch (error) {
