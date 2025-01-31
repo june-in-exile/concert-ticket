@@ -74,7 +74,7 @@ export default function Ticket() {
   const addressText = (
     <p
       id="address"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-0 m-6 text-2xl"
     >
       Your Address: {address}
     </p>
@@ -93,7 +93,7 @@ export default function Ticket() {
   const balanceText = (
     <p
       id="balance"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-6 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-6 right-0 m-6 text-2xl"
     >
       Your ETH Balance: {balance}
     </p>
@@ -110,7 +110,7 @@ export default function Ticket() {
   const ticketText = (
     <p
       id="ticket"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-0 m-6 text-2xl"
     >
       Your Tickets: {tickets.join(", ")}
     </p>
