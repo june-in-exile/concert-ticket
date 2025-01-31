@@ -26,7 +26,8 @@ export default function Ticket() {
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
-  const { buyOnChain, validateOnChain, cancelOnChain, getTicketsOnChain } = useTicketNFT();
+  const { buyOnChain, validateOnChain, cancelOnChain, getTicketsOnChain } =
+    useTicketNFT();
 
   useEffect(() => {
     const init = async () => {
@@ -61,6 +62,16 @@ export default function Ticket() {
     }
   }, [address]);
 
+
+  const addressText = (
+    <p
+      id="address"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
+    >
+      Your Address: {address}
+    </p>
+  );
+
   const showBalance = async () => {
     const rpc = new RPC(provider);
     // this function cannot show the balance of local node
@@ -71,7 +82,7 @@ export default function Ticket() {
   const balanceText = (
     <p
       id="balance"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-6 right-12 m-6 text-2xl"
     >
       Your ETH Balance: {balance}
     </p>
@@ -79,16 +90,18 @@ export default function Ticket() {
 
   const showTickets = async () => {
     const ticketIds = await getTicketsOnChain();
-    const firstZeroIndex = ticketIds.findIndex((ticketId) => ticketId === BigInt(0));
+    const firstZeroIndex = ticketIds.findIndex(
+      (ticketId) => ticketId === BigInt(0),
+    );
     setTickets(ticketIds.slice(0, firstZeroIndex));
   };
 
   const ticketText = (
     <p
       id="ticket"
-      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-5 right-12 m-6 text-2xl"
+      className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-12 m-6 text-2xl"
     >
-      Your Tickets: {tickets.join(', ')}
+      Your Tickets: {tickets.join(", ")}
     </p>
   );
 
@@ -201,7 +214,8 @@ export default function Ticket() {
       {buyTicketButton} {/* center top */}
       {validateTicketInput} {/* center center */}
       {cancelTicketInput} {/* center bottom */}
-      {balanceText} {/* bottom right top */}
+      {addressText} {/* bottom right top */}
+      {balanceText} {/* bottom right center */}
       {ticketText} {/* bottom right bottom */}
     </div>
   );
