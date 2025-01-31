@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAddress, useProvider, useWeb3Auth, useLoggedIn } from "./context";
+import { useProvider, useWeb3Auth, useLoggedIn } from "./context";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import {
   WALLET_ADAPTERS,
@@ -28,7 +28,6 @@ import RPC from "./viemRPC"; // for using viem
 
 export default function Home() {
   const router = useRouter();
-  const { address, setAddress } = useAddress();
   const { provider, setProvider } = useProvider();
   const { web3Auth, setWeb3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -101,24 +100,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleLogin = async () => {
-      if (loggedIn) {
-        await pushAccount();
-      }
-    };
-    handleLogin();
-  }, [router, loggedIn]);
-
-  const pushAccount = async () => {
-    if (!provider) {
-      console.log("provider not initialized yet");
-      return;
+    if (loggedIn) {
+      router.push("/ticket");
     }
-    const rpc = new RPC(provider);
-    const account = await rpc.getAccounts();
-    await setAddress(account);
-    router.push(`/ticket?address=${account}`);
-  };
+  }, [router, loggedIn]);
 
   const loginWithGoogle = async () => {
     if (!web3Auth) {

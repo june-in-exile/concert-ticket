@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  useAddress,
   useWeb3Auth,
   useProvider,
   useLoggedIn,
@@ -20,9 +19,9 @@ export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
+  const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState("");
   const [tickets, setTickets] = useState<BigInt[]>([]);
-  const { address, setAddress } = useAddress();
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -32,6 +31,7 @@ export default function Ticket() {
   useEffect(() => {
     const init = async () => {
       try {
+        showAddress();
         showBalance();
         showTickets();
       } catch (error) {
@@ -62,6 +62,14 @@ export default function Ticket() {
     }
   }, [address]);
 
+  const showAddress = async () => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(provider);
+    setAddress(await rpc.getAccounts());
+  };
 
   const addressText = (
     <p
@@ -73,10 +81,13 @@ export default function Ticket() {
   );
 
   const showBalance = async () => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
     const rpc = new RPC(provider);
     // this function cannot show the balance of local node
-    const balanceInstance = await rpc.getBalance();
-    setBalance(balanceInstance);
+    setBalance(await rpc.getBalance());
   };
 
   const balanceText = (
@@ -91,7 +102,7 @@ export default function Ticket() {
   const showTickets = async () => {
     const ticketIds = await getTicketsOnChain();
     const firstZeroIndex = ticketIds.findIndex(
-      (ticketId) => ticketId === BigInt(0),
+      (ticketId: BigInt) => ticketId === BigInt(0),
     );
     setTickets(ticketIds.slice(0, firstZeroIndex));
   };
@@ -126,9 +137,8 @@ export default function Ticket() {
   );
 
   const buyTicket = async () => {
-    console.log("Buy Ticket");
     await buyOnChain();
-    await Promise.all([showBalance(), showTickets()]);
+    await Promise.all([showAddress(), showBalance(), showTickets()]);
   };
 
   const buyTicketButton = (
@@ -149,7 +159,6 @@ export default function Ticket() {
     if (event.key === "Enter") {
       if (ticketId_pattern.test(validatedTicket)) {
         const ticketId = parseInt(validatedTicket);
-        console.log("Validate Ticket Id %d", ticketId);
         try {
           if (await validateOnChain(ticketId)) {
             console.log(`Ticket ${ticketId} is valid.`);
@@ -185,12 +194,11 @@ export default function Ticket() {
     if (event.key === "Enter") {
       if (ticketId_pattern.test(cancelledTicket)) {
         const ticketId = parseInt(cancelledTicket);
-        console.log("Cancel Ticket Id %d", ticketId);
         await cancelOnChain(ticketId).catch((error) => {
           console.error("Error while cancelling ticket:", error);
         });
         setCancelledTicket("");
-        await Promise.all([showBalance(), showTickets()]);
+        await Promise.all([showAddress(), showBalance(), showTickets()]);
       } else {
         alert(invalid_ticketId_msg);
       }
