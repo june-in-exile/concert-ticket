@@ -161,9 +161,9 @@ export default function Ticket() {
         const ticketId = parseInt(validatedTicket);
         try {
           if (await validateOnChain(ticketId)) {
-            console.log(`Ticket ${ticketId} is valid.`);
+            alert(`Ticket ${validatedTicket} is VALID.`);
           } else {
-            console.log(`Ticket ${ticketId} is not valid.`);
+            alert(`Ticket ${validatedTicket} is NOT valid.`);
           }
         } catch (error) {
           console.error(`Error while validating ticket:`, error);

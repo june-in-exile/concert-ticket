@@ -8,12 +8,12 @@ import { TicketNFT } from "./ticketNFT";
 
 export const Context = ({ children }: { children: ReactNode }) => {
   return (
-      <Provider>
-        <Web3Auth>
-          <LoggedIn>
-            <TicketNFT>{children}</TicketNFT>
-          </LoggedIn>
-        </Web3Auth>
-      </Provider>
+    <Provider>
+      <Web3Auth>
+        <LoggedIn>
+          <TicketNFT>{children}</TicketNFT>
+        </LoggedIn>
+      </Web3Auth>
+    </Provider>
   );
 };
