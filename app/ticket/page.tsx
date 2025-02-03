@@ -101,11 +101,15 @@ export default function Ticket() {
 
   const showTickets = async () => {
     const ticketIds = await getTicketsOnChain();
-    let lastIndex = ticketIds.length - 1;
-    while (lastIndex >= 0 && ticketIds[lastIndex] === BigInt(0)) {
-      lastIndex--;
+    if (ticketIds) {
+      let lastIndex = ticketIds.length - 1;
+      while (lastIndex >= 0 && ticketIds[lastIndex] === BigInt(0)) {
+        lastIndex--;
+      }
+      setTickets(ticketIds.slice(0, lastIndex + 1));
+    } else {
+      setTickets([]);
     }
-    setTickets(ticketIds.slice(0, lastIndex + 1));
   };
 
   const ticketText = (
