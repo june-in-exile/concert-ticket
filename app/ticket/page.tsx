@@ -39,28 +39,28 @@ export default function Ticket() {
         setContract(
           new ethers.Contract(contract_address, ticketNFT.abi, signer),
         );
-        await Promise.all([showAddress(), showBalance(), showTickets()]);
       } catch (error) {
         console.error(error);
       }
     };
 
     init();
-  }, [web3Auth, provider]);
+  }, [provider]);
+
+  useEffect(() => {
+    const initData = async () => {
+      if (contract) {
+        await Promise.all([showAddress(), showBalance(), showTickets()]);
+      }
+    };
+    initData();
+  }, [contract]);
 
   useEffect(() => {
     if (!loggedIn) {
-      setAddress(null);
       router.push(`/`);
-      return;
     }
-    if (!address) {
-      setLoggedIn(false);
-      setProvider(null);
-      router.push(`/`);
-      return;
-    }
-  }, [router, loggedIn, address]);
+  }, [router, loggedIn]);
 
   useEffect(() => {
     if (address && !address_pattern.test(address)) {
@@ -110,7 +110,7 @@ export default function Ticket() {
       throw new Error("Contract not initialized yet");
     }
     const ticketIds = await contract.getMyTickets();
-    if (ticketIds > 0) {
+    if (ticketIds.length) {
       let lastIndex = ticketIds.length - 1;
       while (lastIndex >= 0 && ticketIds[lastIndex] === BigInt(0)) {
         lastIndex--;
@@ -126,7 +126,7 @@ export default function Ticket() {
       id="ticket"
       className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-0 m-6 text-2xl"
     >
-      Your Tickets: {tickets ? tickets.join(", "): "None"}
+      Your Tickets: {tickets ? tickets.join(", ") : "None"}
     </p>
   );
 
@@ -157,6 +157,7 @@ export default function Ticket() {
       }
       const transaction = await contract.buyTicket();
       console.log("Transaction Mined", transaction);
+      
     } catch (error) {
       console.error("Error while buying ticket:", error);
     }
@@ -184,17 +185,24 @@ export default function Ticket() {
         return;
       }
       const ticketId = parseInt(validatedTicket);
+      let isValid: boolean;
       try {
         if (!contract) {
           throw new Error("Contract not initialized yet");
         }
-        if (await contract.isTicketValid(ticketId)) {
-          alert(`Ticket ${validatedTicket} is VALID.`);
-        } else {
-          alert(`Ticket ${validatedTicket} is NOT valid.`);
-        }
+        isValid = await contract.isTicketValid(ticketId);
       } catch (error) {
-        console.error(`Error while validating ticket:`, error);
+        if (error.message.includes("ERC721NonexistentToken")) {
+          isValid = false;
+        } else { 
+          alert(`Error while validating ticket: ${error.message}`);
+          return;
+        }
+      };
+      if (isValid) {
+        alert(`Ticket ${validatedTicket} is VALID.`);
+      } else {
+        alert(`Ticket ${validatedTicket} is NOT valid.`);
       }
       setValidatedTicket("");
     }
@@ -222,14 +230,32 @@ export default function Ticket() {
         return;
       }
       const ticketId = parseInt(cancelledTicket);
+      let isValid: boolean;
       try {
         if (!contract) {
           throw new Error("Contract not initialized yet");
         }
+        isValid = await contract.isTicketValid(ticketId);
+      } catch (error) {
+        if (error.message.includes("ERC721NonexistentToken")) {
+          isValid = false;
+        } else {
+          alert(`Error while validating ticket: ${error.message}`);
+          return;
+        };
+      };
+      try {
+        if (!contract) {
+          throw new Error("Contract not initialized yet");
+        }
+        if (!isValid) {
+          throw new Error(`Ticket ${cancelledTicket} is NOT valid and cannot be cancelled.`);
+        }
         const transaction = await contract.cancelTicket(ticketId);
         console.log("Transaction Mined", transaction);
+        alert(`Ticket ${cancelledTicket} cancelled.`);
       } catch (error) {
-        console.error("Error while cancelling ticket:", error);
+        alert(`Error while cancelling ticket: ${error.message}`);
       }
       setCancelledTicket("");
       await Promise.all([showAddress(), showBalance(), showTickets()]);
