@@ -18,7 +18,6 @@ import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { createWalletClient, custom } from "viem";
 import {
   chain,
-  arb_sepolia_usdc,
   arb_sepolia_chainId,
   pimlico_api_key,
   w3a_clientId,

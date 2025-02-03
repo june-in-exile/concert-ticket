@@ -2,18 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
 import {
-  useWeb3Auth,
-  useProvider,
-  useLoggedIn,
-  useTicketNFT,
-} from "../context";
-import {
+  rpcUrl,
   ticketId_pattern,
   address_pattern,
   invalid_ticketId_msg,
+  contract_address,
 } from "../constant";
+import { ethers } from "ethers";
 import RPC from ".././viemRPC";
+import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 
 export default function Ticket() {
   const router = useRouter();
@@ -21,26 +20,33 @@ export default function Ticket() {
   const [cancelledTicket, setCancelledTicket] = useState("");
   const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState("");
-  const [tickets, setTickets] = useState<BigInt[]>([]);
+  const [tickets, setTickets] = useState<BigInt[] | null>(null);
+  const [contract, setContract] = useState<ethers.Contract | null>(null);
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
-  const { buyOnChain, validateOnChain, cancelOnChain, getTicketsOnChain } =
-    useTicketNFT();
 
   useEffect(() => {
     const init = async () => {
       try {
-        showAddress();
-        showBalance();
-        showTickets();
+        if (!provider) {
+          throw new Error("Provider not initialized yet");
+        }
+        const rpc = new RPC(provider);
+        const privateKey = await rpc.getPrivateKey();
+        const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+        const signer = new ethers.Wallet(privateKey, rpcProvider);
+        setContract(
+          new ethers.Contract(contract_address, ticketNFT.abi, signer),
+        );
+        await Promise.all([showAddress(), showBalance(), showTickets()]);
       } catch (error) {
         console.error(error);
       }
     };
 
     init();
-  }, []);
+  }, [web3Auth, provider]);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -100,15 +106,18 @@ export default function Ticket() {
   );
 
   const showTickets = async () => {
-    const ticketIds = await getTicketsOnChain();
-    if (ticketIds) {
+    if (!contract) {
+      throw new Error("Contract not initialized yet");
+    }
+    const ticketIds = await contract.getMyTickets();
+    if (ticketIds > 0) {
       let lastIndex = ticketIds.length - 1;
       while (lastIndex >= 0 && ticketIds[lastIndex] === BigInt(0)) {
         lastIndex--;
       }
       setTickets(ticketIds.slice(0, lastIndex + 1));
     } else {
-      setTickets([]);
+      setTickets(null);
     }
   };
 
@@ -117,7 +126,7 @@ export default function Ticket() {
       id="ticket"
       className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-0 m-6 text-2xl"
     >
-      Your Tickets: {tickets.join(", ")}
+      Your Tickets: {tickets ? tickets.join(", "): "None"}
     </p>
   );
 
@@ -142,7 +151,15 @@ export default function Ticket() {
   );
 
   const buyTicket = async () => {
-    await buyOnChain();
+    try {
+      if (!contract) {
+        throw new Error("Contract not initialized yet");
+      }
+      const transaction = await contract.buyTicket();
+      console.log("Transaction Mined", transaction);
+    } catch (error) {
+      console.error("Error while buying ticket:", error);
+    }
     await Promise.all([showAddress(), showBalance(), showTickets()]);
   };
 
@@ -162,21 +179,24 @@ export default function Ticket() {
 
   const validateTicket = async (event) => {
     if (event.key === "Enter") {
-      if (ticketId_pattern.test(validatedTicket)) {
-        const ticketId = parseInt(validatedTicket);
-        try {
-          if (await validateOnChain(ticketId)) {
-            alert(`Ticket ${validatedTicket} is VALID.`);
-          } else {
-            alert(`Ticket ${validatedTicket} is NOT valid.`);
-          }
-        } catch (error) {
-          console.error(`Error while validating ticket:`, error);
-        }
-        setValidatedTicket("");
-      } else {
+      if (!ticketId_pattern.test(validatedTicket)) {
         alert(invalid_ticketId_msg);
+        return;
       }
+      const ticketId = parseInt(validatedTicket);
+      try {
+        if (!contract) {
+          throw new Error("Contract not initialized yet");
+        }
+        if (await contract.isTicketValid(ticketId)) {
+          alert(`Ticket ${validatedTicket} is VALID.`);
+        } else {
+          alert(`Ticket ${validatedTicket} is NOT valid.`);
+        }
+      } catch (error) {
+        console.error(`Error while validating ticket:`, error);
+      }
+      setValidatedTicket("");
     }
   };
 
@@ -197,16 +217,22 @@ export default function Ticket() {
 
   const cancelTicket = async (event) => {
     if (event.key === "Enter") {
-      if (ticketId_pattern.test(cancelledTicket)) {
-        const ticketId = parseInt(cancelledTicket);
-        await cancelOnChain(ticketId).catch((error) => {
-          console.error("Error while cancelling ticket:", error);
-        });
-        setCancelledTicket("");
-        await Promise.all([showAddress(), showBalance(), showTickets()]);
-      } else {
+      if (!ticketId_pattern.test(cancelledTicket)) {
         alert(invalid_ticketId_msg);
+        return;
       }
+      const ticketId = parseInt(cancelledTicket);
+      try {
+        if (!contract) {
+          throw new Error("Contract not initialized yet");
+        }
+        const transaction = await contract.cancelTicket(ticketId);
+        console.log("Transaction Mined", transaction);
+      } catch (error) {
+        console.error("Error while cancelling ticket:", error);
+      }
+      setCancelledTicket("");
+      await Promise.all([showAddress(), showBalance(), showTickets()]);
     }
   };
 
