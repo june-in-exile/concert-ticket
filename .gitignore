@@ -42,7 +42,6 @@ next-env.d.ts
 
 # Compiler files
 cache/
-out/
 
 # Ignores development logs
 foundry/broadcast/*
