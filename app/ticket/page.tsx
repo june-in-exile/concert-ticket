@@ -176,23 +176,21 @@ export default function Ticket() {
       }
       const ticketId = parseInt(validatedTicket);
 
-      let isValid: boolean;
       try {
         if (!provider) {
           throw new Error("Provider not initialized yet");
         }
         const rpc = new RPC(provider);
-        isValid = await rpc.isYourTicket(ticketId);
-        console.log("isValid = ", isValid);
+        const isValid = await rpc.isMyTicket(ticketId);
+        if (isValid) {
+          alert(`Ticket ${validatedTicket} is VALID.`);
+        } else {
+          alert(`Ticket ${validatedTicket} is NOT valid.`);
+        }
       } catch (error) {
         console.error(`Error while validating ticket: ${error.message}`);
         alert(`Error while validating ticket.`);
         return;
-      }
-      if (isValid) {
-        alert(`Ticket ${validatedTicket} is VALID.`);
-      } else {
-        alert(`Ticket ${validatedTicket} is NOT valid.`);
       }
       setValidatedTicket("");
     }
@@ -225,7 +223,7 @@ export default function Ticket() {
           throw new Error("Provider not initialized yet");
         }
         const rpc = new RPC(provider);
-        const isValid = await rpc.isYourTicket(ticketId);
+        const isValid = await rpc.isMyTicket(ticketId);
         if (!isValid) {
           alert("You are not the owner of this ticket");
           return;

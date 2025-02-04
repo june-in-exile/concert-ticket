@@ -19,12 +19,12 @@ import {
   sepolia,
   anvil,
 } from "viem/chains";
-import { privateKeyToAccount } from 'viem/accounts'
+import { privateKeyToAccount } from "viem/accounts";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
 import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
-import { contract_address, w3a_private_key, chain, rpcUrl } from "./constant";
+import { contract_address, w3a_account, w3a_private_key, chain, rpcUrl } from "./constant";
 import { local } from "web3modal";
 
 export default class EthereumRpc {
@@ -40,12 +40,12 @@ export default class EthereumRpc {
       transport: chain === anvil ? http() : custom(provider),
     });
     this.walletClient = createWalletClient({
-      account: chain === anvil ? privateKeyToAccount(w3a_private_key) : undefined,
+      account:
+        chain === anvil ? w3a_account : undefined,
       chain: chain,
       transport: chain === anvil ? http() : custom(provider),
     });
-
-  };
+  }
 
   getViewChain() {
     switch (this.provider.chainId) {
@@ -92,7 +92,7 @@ export default class EthereumRpc {
 
   async getPrivateKey(): Promise<any> {
     try {
-      if (chain === anvil) { 
+      if (chain === anvil) {
         return w3a_private_key;
       }
       const privateKey = await this.provider.request({
@@ -138,15 +138,15 @@ export default class EthereumRpc {
     }
   }
 
-  async isYourTicket(ticketId: number) {
+  async isMyTicket(ticketId: number) {
     try {
       const accounts = await this.getAccounts();
 
       const isValid = await this.publicClient.readContract({
-        account: chain === anvil ? undefined : accounts[0],
+        account: chain === anvil ? w3a_account : accounts[0],
         address: contract_address,
         abi: this.contractABI,
-        functionName: "isYourTicket",
+        functionName: "isMyTicket",
         args: [ticketId],
       });
 
@@ -183,7 +183,7 @@ export default class EthereumRpc {
       const accounts = await this.getAccounts();
 
       const ticketIds = await this.publicClient.readContract({
-        account: chain === anvil ? undefined : accounts[0],
+        account: chain === anvil ? w3a_account : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "getMyTickets",

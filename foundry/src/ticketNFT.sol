@@ -23,13 +23,13 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
     }
 
     function cancelTicket(uint256 tokenId) external {
-        require(isYourTicket(tokenId), "You are not the owner of this ticket");
+        require(isMyTicket(tokenId), "You are not the owner of this ticket");
         _burn(tokenId);
 
         emit TicketCanceled(msg.sender, tokenId);
     }
 
-    function isYourTicket(uint256 tokenId) public view returns (bool) {
+    function isMyTicket(uint256 tokenId) public view returns (bool) {
         return (_ownerOf(tokenId) == msg.sender);
     }
 
@@ -39,7 +39,7 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
         uint256 currentIndex = 0;
 
         for (uint256 i = 1; i < _nextTokenId; i++) {
-            if (_ownerOf(i) == msg.sender) {
+            if (isMyTicket(i)) {
                 ownedTickets[currentIndex++] = i;
             }
         }

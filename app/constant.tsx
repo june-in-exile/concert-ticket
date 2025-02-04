@@ -25,7 +25,9 @@ export const invalid_ticketId_msg =
   "Ticket ID should be a nonzero 4-digit number.";
 
 // personal
-export const w3a_private_key = process.env.NEXT_PUBLIC_W3A_PRIVATE_KEY as `0x${string}`;
+export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;
+export const w3a_private_key = process.env
+  .NEXT_PUBLIC_W3A_PRIVATE_KEY as `0x${string}`;
 export const pimlico_api_key = "pim_6uN1PB3Q8fGTd86Xskgthf"; // get from dashboard.pimlico.io/
 export const w3a_clientId =
   "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from dashboard.web3auth.io
