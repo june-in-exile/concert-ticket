@@ -1,19 +1,12 @@
 import {
-  createClient,
   createWalletClient,
   createPublicClient,
   http,
   custom,
   formatEther,
-  parseEther,
-  HttpTransport,
-  decodeErrorResult,
-  CustomTransport,
 } from "viem";
 import {
-  arbitrum,
   arbitrumSepolia,
-  localhost,
   mainnet,
   polygonAmoy,
   sepolia,
@@ -24,8 +17,12 @@ import { privateKeyToAccount } from "viem/accounts";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
 import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
-import { contract_address, w3a_account, w3a_private_key, chain, rpcUrl } from "./constant";
-import { local } from "web3modal";
+import {
+  contract_address,
+  w3a_account,
+  w3a_private_key,
+  chain,
+} from "./constant";
 
 export default class EthereumRpc {
   private provider: IProvider;
@@ -36,13 +33,13 @@ export default class EthereumRpc {
   constructor(provider: IProvider) {
     this.provider = provider;
     this.publicClient = createPublicClient({
-      chain: chain,
+      chain,
       transport: chain === anvil ? http() : custom(provider),
     });
     this.walletClient = createWalletClient({
       account:
-        chain === anvil ? w3a_account : undefined,
-      chain: chain,
+        chain === anvil ? privateKeyToAccount(w3a_private_key) : undefined,
+      chain,
       transport: chain === anvil ? http() : custom(provider),
     });
   }
@@ -75,7 +72,9 @@ export default class EthereumRpc {
 
   async getAddresses(): Promise<any> {
     try {
-      return await this.walletClient.getAddresses();
+      return chain === anvil
+        ? [w3a_account]
+        : await this.walletClient.getAddresses();
     } catch (error) {
       return error;
     }
@@ -143,7 +142,7 @@ export default class EthereumRpc {
       const accounts = await this.getAccounts();
 
       const isValid = await this.publicClient.readContract({
-        account: chain === anvil ? w3a_account : accounts[0],
+        account: accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "isMyTicket",
@@ -183,7 +182,7 @@ export default class EthereumRpc {
       const accounts = await this.getAccounts();
 
       const ticketIds = await this.publicClient.readContract({
-        account: chain === anvil ? w3a_account : accounts[0],
+        account: accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "getMyTickets",
