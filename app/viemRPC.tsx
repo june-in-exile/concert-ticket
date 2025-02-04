@@ -214,7 +214,6 @@ export default class EthereumRpc {
     }
   }
 
-
   async buyTicket() {
     try {
       const publicClient = createPublicClient({

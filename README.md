@@ -23,6 +23,10 @@ $ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}
 
 _(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already filled.)_
 
+```bash
+$ source .env
+```
+
 Build.
 
 ```
@@ -54,18 +58,14 @@ $ cd foundry \
 >     script/ticketNFT.deploy.sol:TicketNFTScript
 > ```
 
-Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment and choose the corresponding `NEXT_PUBLIC_CHAIN`. Then, run
-
-```bash
-$ source .env
-```
+Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment.
 
 ## 4. Start Frontend & Server
 
 Run the development server:
 
 ```bash
-npm run dev
+$ npm run dev
 ```
 
 and open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -74,7 +74,7 @@ and open [http://localhost:3000](http://localhost:3000) with your browser to see
 
 _(This step is required only for local testing.)_
 
-After logging, fill the `NEXT_PUBLIC_GMAIL_ACCOUNT` field in `.env` with your account created through Gmail (which you can get from the URL) and run
+After logging, fill the `NEXT_PUBLIC_W3A_ACCOUNT` field in `.env` with your address created through Gmail (which you can get from the URL) and run
 
 ```bash
 $ source .env
@@ -83,13 +83,13 @@ $ source .env
 Send 1 ETH to your account created through Gmail:
 
 ```bash
-$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_GMAIL_ACCOUNT} --value 1ether
+$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_W3A_ACCOUNT} --value 1ether
 ```
 
 Check your ETH balance:
 
 ```bash
-$ cast balance ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+$ cast balance ${NEXT_PUBLIC_W3A_ACCOUNT}
 ```
 
 Send 10 USDC:
@@ -101,5 +101,5 @@ $ cast rpc anvil_impersonateAccount ${NEXT_PUBLIC_ANVIL_ALICE}
 Check your USDC balance:
 
 ```bash
-$ cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_GMAIL_ACCOUNT}
+$ cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_W3A_ACCOUNT}
 ```

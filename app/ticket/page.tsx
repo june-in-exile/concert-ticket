@@ -12,7 +12,13 @@ import {
   invalid_ticketId_msg,
   contract_address,
 } from "../constant";
-import { createPublicClient, createWalletClient, getContract, custom, http } from 'viem'
+import {
+  createPublicClient,
+  createWalletClient,
+  getContract,
+  custom,
+  http,
+} from "viem";
 import RPC from ".././viemRPC";
 import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 
@@ -96,7 +102,9 @@ export default function Ticket() {
     const rpc = new RPC(provider);
     const ticketIds = await rpc.getMyTickets();
     if (ticketIds.length) {
-      const validTickets = ticketIds.filter(ticketId => ticketId !== BigInt(0));
+      const validTickets = ticketIds.filter(
+        (ticketId) => ticketId !== BigInt(0),
+      );
       setTickets(validTickets.length ? validTickets : null);
     } else {
       setTickets(null);
@@ -171,7 +179,7 @@ export default function Ticket() {
 
       if (!provider) {
         throw new Error("Provider not initialized yet");
-      };
+      }
       const rpc = new RPC(provider);
 
       let isValid: boolean;
@@ -221,7 +229,7 @@ export default function Ticket() {
 
       if (!provider) {
         throw new Error("Provider not initialized yet");
-      };
+      }
       const rpc = new RPC(provider);
 
       let isValid: boolean;
@@ -251,7 +259,7 @@ export default function Ticket() {
       }
       setCancelledTicket("");
       await Promise.all([showAddress(), showBalance(), showTickets()]);
-    };
+    }
   };
 
   const cancelTicketInput = (
