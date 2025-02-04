@@ -10,20 +10,22 @@ import {
   UX_MODE,
 } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
-import {
-  AccountAbstractionProvider,
-  SafeSmartAccount,
-} from "@web3auth/account-abstraction-provider";
+// import {
+//   AccountAbstractionProvider,
+//   SafeSmartAccount,
+// } from "@web3auth/account-abstraction-provider";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
-import { createWalletClient, custom } from "viem";
+// import { createWalletClient, custom } from "viem";
 import {
   chain,
+  rpcUrl,
   arb_sepolia_chainId,
-  pimlico_api_key,
+  // pimlico_api_key,
   w3a_clientId,
   google_clientId,
 } from "./constant";
-import RPC from "./viemRPC"; // for using viem
+// import RPC from "./viemRPC"; // for using viem
+import { arbitrumSepolia } from "viem/chains";
 
 export default function Home() {
   const router = useRouter();
@@ -45,18 +47,18 @@ export default function Home() {
           logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
         };
 
-        const accountAbstractionProvider = new AccountAbstractionProvider({
-          config: {
-            chainConfig,
-            bundlerConfig: {
-              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-            },
-            smartAccountInit: new SafeSmartAccount(),
-            paymasterConfig: {
-              url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-            },
-          },
-        });
+        // const accountAbstractionProvider = new AccountAbstractionProvider({
+        //   config: {
+        //     chainConfig,
+        //     bundlerConfig: {
+        //       url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+        //     },
+        //     smartAccountInit: new SafeSmartAccount(),
+        //     paymasterConfig: {
+        //       url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
+        //     },
+        //   },
+        // });
 
         const privateKeyProvider = new EthereumPrivateKeyProvider({
           config: { chainConfig },

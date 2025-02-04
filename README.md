@@ -16,7 +16,7 @@ Note that in the first line of `.env` you can choose which chain you would like 
 _(This step is required only for local testing.)_
 
 ```bash
-$ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}
+$ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} --chain-id ${NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID}
 ```
 
 ## 3. Build & Deploy

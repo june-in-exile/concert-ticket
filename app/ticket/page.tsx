@@ -6,7 +6,6 @@ import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
 import {
   chain,
   rpcUrl,
-  alchemy_api_key,
   ticketId_pattern,
   address_pattern,
   invalid_ticketId_msg,
@@ -184,7 +183,7 @@ export default function Ticket() {
 
       let isValid: boolean;
       try {
-        isValid = await rpc.isTicketValid(ticketId);
+        isValid = await rpc.isYourTicket(ticketId);
         console.log("isValid = ", isValid);
       } catch (error) {
         if (error.message.includes("ERC721NonexistentToken")) {
@@ -234,7 +233,7 @@ export default function Ticket() {
 
       let isValid: boolean;
       try {
-        isValid = await rpc.isTicketValid(ticketId);
+        isValid = await rpc.isYourTicket(ticketId);
       } catch (error) {
         if (error.message.includes("ERC721NonexistentToken")) {
           isValid = false;
