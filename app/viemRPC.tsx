@@ -1,4 +1,5 @@
 import {
+  createClient,
   createWalletClient,
   createPublicClient,
   http,
@@ -7,6 +8,7 @@ import {
   parseEther,
   HttpTransport,
   decodeErrorResult,
+  CustomTransport,
 } from "viem";
 import {
   arbitrum,
@@ -15,40 +17,42 @@ import {
   mainnet,
   polygonAmoy,
   sepolia,
+  anvil,
 } from "viem/chains";
+import { privateKeyToAccount } from 'viem/accounts'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
 import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
-import { rpcUrl, contract_address, chain } from "./constant";
+import { contract_address, w3a_private_key, chain, rpcUrl } from "./constant";
 import { local } from "web3modal";
 
 export default class EthereumRpc {
   private provider: IProvider;
-  private transport: HttpTransport;
   private publicClient;
   private walletClient;
-
   private contractABI = ticketNFT.abi;
 
   constructor(provider: IProvider) {
     this.provider = provider;
     this.publicClient = createPublicClient({
-      chain: this.getViewChain(),
-      transport: custom(this.provider),
+      chain: chain,
+      transport: chain === anvil ? http() : custom(provider),
     });
     this.walletClient = createWalletClient({
-      chain: this.getViewChain(),
-      transport: custom(this.provider),
+      account: chain === anvil ? privateKeyToAccount(w3a_private_key) : undefined,
+      chain: chain,
+      transport: chain === anvil ? http() : custom(provider),
     });
-  }
+
+  };
 
   getViewChain() {
     switch (this.provider.chainId) {
       case "1":
         return mainnet;
       case "0x539":
-        return localhost;
+        return anvil;
       case "0x13882":
         return polygonAmoy;
       case "0x66eee":
@@ -88,6 +92,9 @@ export default class EthereumRpc {
 
   async getPrivateKey(): Promise<any> {
     try {
+      if (chain === anvil) { 
+        return w3a_private_key;
+      }
       const privateKey = await this.provider.request({
         method: "eth_private_key",
       });
@@ -100,97 +107,30 @@ export default class EthereumRpc {
   async getBalance(): Promise<string> {
     try {
       const address = await this.getAccounts();
-      const balance = await this.publicClient.getBalance({ address: address[0] });
+      const balance = await this.publicClient.getBalance({
+        address: address[0],
+      });
       return formatEther(balance);
     } catch (error) {
       return error as string;
     }
   }
 
-  // async sendTransaction(): Promise<any> {
-  //   try {
-  //     const destination = "0x40e1c367Eca34250cAF1bc8330E9EddfD403fC56";
-  //     const amount = parseEther("0.0001");
-  //     const address = await this.getAccounts();
-
-  //     const hash = await this.walletClient.sendTransaction({
-  //       account: address[0],
-  //       to: destination,
-  //       value: amount,
-  //     });
-  //     const receipt = await this.publicClient.waitForTransactionReceipt({ hash });
-
-  //     return this.toObject(receipt);
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
-
-  // async signMessage() {
-  //   try {
-  //     const address = await this.getAccounts();
-  //     const originalMessage = "YOUR_MESSAGE";
-
-  //     const hash = await this.walletClient.signMessage({
-  //       account: address[0],
-  //       message: originalMessage,
-  //     });
-
-  //     return hash.toString();
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
-
-  // async readContract() {
-  //   try {
-  //     const number = await this.publicClient.readContract({
-  //       address: "0x9554a5CC8F600F265A89511e5802945f2e8A5F5D",
-  //       abi: this.contractABI,
-  //       functionName: "retrieve",
-  //     });
-
-  //     return this.toObject(number);
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
-
-  // async writeContract() {
-  //   try {
-  //     const address = await this.getAccounts();
-  //     const randomNumber = Math.floor(Math.random() * 9000) + 1000;
-
-  //     // Submit transaction to the blockchain
-  //     const hash = await this.walletClient.writeContract({
-  //       account: address[0],
-  //       address: "0x9554a5CC8F600F265A89511e5802945f2e8A5F5D",
-  //       abi: this.contractABI,
-  //       functionName: "store",
-  //       args: [randomNumber],
-  //     });
-
-  //     const receipt = await this.publicClient.waitForTransactionReceipt({ hash });
-
-  //     return this.toObject(receipt);
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
-
   async buyTicket() {
     try {
       const accounts = await this.getAccounts();
 
       const hash = await this.walletClient.writeContract({
-        account: accounts[0],
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "buyTicket",
         args: [],
       });
 
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash });
+      const receipt = await this.publicClient.waitForTransactionReceipt({
+        hash,
+      });
 
       return this.toObject(receipt);
     } catch (error) {
@@ -203,7 +143,7 @@ export default class EthereumRpc {
       const accounts = await this.getAccounts();
 
       const isValid = await this.publicClient.readContract({
-        account: accounts[0],
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "isYourTicket",
@@ -221,14 +161,16 @@ export default class EthereumRpc {
       const accounts = await this.getAccounts();
 
       const hash = await this.walletClient.writeContract({
-        account: accounts[0],
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "cancelTicket",
         args: [ticketId],
       });
 
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash });
+      const receipt = await this.publicClient.waitForTransactionReceipt({
+        hash,
+      });
 
       return this.toObject(receipt);
     } catch (error) {
@@ -238,7 +180,10 @@ export default class EthereumRpc {
 
   async getMyTickets() {
     try {
+      const accounts = await this.getAccounts();
+
       const ticketIds = await this.publicClient.readContract({
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "getMyTickets",

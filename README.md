@@ -6,7 +6,6 @@ Copy `.env.example` as `.env` and change the values to yours.
 
 ```bash
 $ cp .env.example .env
-$ source .env
 ```
 
 Note that in the first line of `.env` you can choose which chain you would like to use (default to "ANVIL", which is for local testing).
@@ -16,7 +15,8 @@ Note that in the first line of `.env` you can choose which chain you would like 
 _(This step is required only for local testing.)_
 
 ```bash
-$ anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} --chain-id ${NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID}
+$ source .env \
+    && anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} --chain-id 31337
 ```
 
 ## 3. Build & Deploy

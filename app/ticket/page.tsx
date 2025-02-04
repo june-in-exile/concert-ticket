@@ -183,6 +183,7 @@ export default function Ticket() {
         }
         const rpc = new RPC(provider);
         isValid = await rpc.isYourTicket(ticketId);
+        console.log("isValid = ", isValid);
       } catch (error) {
         console.error(`Error while validating ticket: ${error.message}`);
         alert(`Error while validating ticket.`);
@@ -219,15 +220,12 @@ export default function Ticket() {
         return;
       }
       const ticketId = parseInt(cancelledTicket);
-
-      if (!provider) {
-        throw new Error("Provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
-
-      let isValid: boolean;
       try {
-        isValid = await rpc.isYourTicket(ticketId);
+        if (!provider) {
+          throw new Error("Provider not initialized yet");
+        }
+        const rpc = new RPC(provider);
+        const isValid = await rpc.isYourTicket(ticketId);
         if (!isValid) {
           alert("You are not the owner of this ticket");
           return;
@@ -235,11 +233,11 @@ export default function Ticket() {
         const transaction = await rpc.cancelTicket(ticketId);
         console.log("Transaction Mined", transaction);
         alert(`Ticket ${cancelledTicket} cancelled.`);
-        setCancelledTicket("");
       } catch (error) {
         console.error(`Error while cancelling ticket: ${error.message}`);
         alert(`Error while cancelling ticket.`);
       }
+      setCancelledTicket("");
       await Promise.all([showAddress(), showBalance(), showTickets()]);
     }
   };
