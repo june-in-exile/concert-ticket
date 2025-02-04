@@ -14,20 +14,20 @@ contract TicketNFTTest is Test {
         ticketNFT = new TicketNFT();
     }
 
-    function testFirstTicket() public {
-        vm.startPrank(alice);
-        ticketNFT.buyTicket();
-        vm.expectRevert(IERC721Errors.ERC721NonexistentToken.selector, 0);
-        ticketNFT.ownerOf(0);
-        assertEq(ticketNFT.ownerOf(1), alice);
-        vm.stopPrank();
+    function testValidateTicketsNotExist() public {
+        vm.prank(alice);
+        assertFalse(ticketNFT.isYourTicket(0));
+        assertFalse(ticketNFT.isYourTicket(1));
     }
 
     function testBuyTicket() public {
         vm.startPrank(alice);
         ticketNFT.buyTicket();
+        assertFalse(ticketNFT.isYourTicket(0));
+        assertTrue(ticketNFT.isYourTicket(1));
+        vm.expectRevert(IERC721Errors.ERC721NonexistentToken.selector, 0);
+        ticketNFT.ownerOf(0);
         assertEq(ticketNFT.ownerOf(1), alice);
-        assertTrue(ticketNFT.isTicketValid(1));
         vm.stopPrank();
     }
 
@@ -35,8 +35,8 @@ contract TicketNFTTest is Test {
         vm.startPrank(alice);
         ticketNFT.buyTicket();
         ticketNFT.buyTicket();
-        assertTrue(ticketNFT.isTicketValid(1));
-        assertTrue(ticketNFT.isTicketValid(2));
+        assertTrue(ticketNFT.isYourTicket(1));
+        assertTrue(ticketNFT.isYourTicket(2));
         assertEq(ticketNFT.ownerOf(1), alice);
         assertEq(ticketNFT.ownerOf(2), alice);
         vm.stopPrank();
@@ -46,15 +46,15 @@ contract TicketNFTTest is Test {
         vm.prank(alice);
         ticketNFT.buyTicket();
         vm.prank(bob);
-        vm.expectRevert("You are not the owner of this ticket");
-        ticketNFT.isTicketValid(1);
+        assertFalse(ticketNFT.isYourTicket(1));
     }
 
     function testCancelTicket() public {
         vm.startPrank(alice);
         ticketNFT.buyTicket();
+        assertTrue(ticketNFT.isYourTicket(1));
         ticketNFT.cancelTicket(1);
-        assertFalse(ticketNFT.isTicketValid(1));
+        assertFalse(ticketNFT.isYourTicket(1));
         vm.stopPrank();
     }
 
@@ -66,14 +66,17 @@ contract TicketNFTTest is Test {
         ticketNFT.cancelTicket(1);
     }
 
-    function testCancelInvalidTicket() public {
-        vm.prank(alice);
+    function testCancelInvalidTickets() public {
+        vm.startPrank(alice);
         ticketNFT.buyTicket();
-        vm.prank(alice);
         ticketNFT.cancelTicket(1);
-        vm.prank(alice);
-        vm.expectRevert("Ticket is already invalid");
+        vm.expectRevert("You are not the owner of this ticket");
+        ticketNFT.cancelTicket(0);
+        vm.expectRevert("You are not the owner of this ticket");
         ticketNFT.cancelTicket(1);
+        vm.expectRevert("You are not the owner of this ticket");
+        ticketNFT.cancelTicket(2);
+        vm.stopPrank();
     }
 
     function testGetMyTickets() public {
@@ -81,7 +84,7 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket(); // 1
         ticketNFT.buyTicket(); // 2
         ticketNFT.buyTicket(); // 3
-        ticketNFT.cancelTicket(1);
+        ticketNFT.cancelTicket(2);
         vm.stopPrank();
 
         vm.startPrank(bob);
@@ -90,14 +93,12 @@ contract TicketNFTTest is Test {
         ticketNFT.cancelTicket(5);
         vm.stopPrank();
 
-        uint256[] memory aliceTickets = new uint256[](3);
-        aliceTickets[0] = 2;
+        uint256[] memory aliceTickets = new uint256[](2);
+        aliceTickets[0] = 1;
         aliceTickets[1] = 3;
-        aliceTickets[2] = 0;
 
-        uint256[] memory bobTickets = new uint256[](2);
+        uint256[] memory bobTickets = new uint256[](1);
         bobTickets[0] = 4;
-        bobTickets[1] = 0;
 
         vm.prank(alice);
         assertEq(ticketNFT.getMyTickets(), aliceTickets);

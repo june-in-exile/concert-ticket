@@ -5,36 +5,32 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TicketNFT is ERC721, Ownable(msg.sender) {
-    uint256 private nextTokenId;
-    mapping(uint256 => bool) private validTickets;
+    uint256 private _nextTokenId;
 
     event TicketBuyed(address indexed user, uint256 tokenId);
     event TicketCanceled(address indexed user, uint256 tokenId);
 
     constructor() ERC721("TicketNFT", "TNFT") {
-        nextTokenId = 1;
+        _nextTokenId = 1;
     }
 
     function buyTicket() external {
-        uint256 tokenId = nextTokenId;
+        uint256 tokenId = _nextTokenId;
         _safeMint(msg.sender, tokenId);
-        validTickets[tokenId] = true;
-        nextTokenId++;
+        _nextTokenId++;
 
         emit TicketBuyed(msg.sender, tokenId);
     }
 
     function cancelTicket(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "You are not the owner of this ticket");
-        require(validTickets[tokenId], "Ticket is already invalid");
-        validTickets[tokenId] = false;
+        require(isYourTicket(tokenId), "You are not the owner of this ticket");
+        _burn(tokenId);
 
         emit TicketCanceled(msg.sender, tokenId);
     }
 
-    function isTicketValid(uint256 tokenId) external view returns (bool) {
-        require(ownerOf(tokenId) == msg.sender, "You are not the owner of this ticket");
-        return validTickets[tokenId];
+    function isYourTicket(uint256 tokenId) public view returns (bool) {
+        return (_ownerOf(tokenId) == msg.sender);
     }
 
     function getMyTickets() external view returns (uint256[] memory) {
@@ -42,10 +38,9 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
         uint256[] memory ownedTickets = new uint256[](tokenCount);
         uint256 currentIndex = 0;
 
-        for (uint256 i = 1; i < nextTokenId; i++) {
-            if (ownerOf(i) == msg.sender && validTickets[i]) {
-                ownedTickets[currentIndex] = i;
-                currentIndex++;
+        for (uint256 i = 1; i < _nextTokenId; i++) {
+            if (_ownerOf(i) == msg.sender) {
+                ownedTickets[currentIndex++] = i;
             }
         }
         return ownedTickets;

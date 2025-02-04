@@ -6,7 +6,6 @@ import {
   parseEther,
 } from "viem";
 import {
-  arbitrumNova,
   arbitrumSepolia,
   localhost,
   mainnet,
@@ -17,6 +16,7 @@ import {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
 import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
+import { contract_address } from "./constant";
 
 export default class EthereumRpc {
   private provider: IProvider;
@@ -209,6 +209,110 @@ export default class EthereumRpc {
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
       return this.toObject(receipt);
+    } catch (error) {
+      return error;
+    }
+  }
+
+
+  async buyTicket() {
+    try {
+      const publicClient = createPublicClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const walletClient = createWalletClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const accounts = await this.getAccounts();
+
+      const hash = await walletClient.writeContract({
+        account: accounts[0],
+        address: contract_address,
+        abi: this.contractABI,
+        functionName: "buyTicket",
+        // args: [],
+      });
+
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+      return this.toObject(receipt);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async isTicketValid(ticketId: number) {
+    try {
+      const publicClient = createPublicClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const accounts = await this.getAccounts();
+
+      const isValid = await publicClient.readContract({
+        account: accounts[0],
+        address: contract_address,
+        abi: this.contractABI,
+        functionName: "isTicketValid",
+        args: [ticketId],
+      });
+
+      return this.toObject(isValid);
+    } catch (error) {
+      console.error(error);
+      // throw new Error(error);
+    }
+  }
+
+  async cancelTicket(ticketId: number) {
+    try {
+      const publicClient = createPublicClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const walletClient = createWalletClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const accounts = await this.getAccounts();
+
+      const hash = await walletClient.writeContract({
+        account: accounts[0],
+        address: contract_address,
+        abi: this.contractABI,
+        functionName: "cancelTicket",
+        args: [ticketId],
+      });
+
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+      return this.toObject(receipt);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getMyTickets() {
+    try {
+      const publicClient = createPublicClient({
+        chain: this.getViewChain(),
+        transport: custom(this.provider),
+      });
+
+      const ticketIds = await publicClient.readContract({
+        address: contract_address,
+        abi: this.contractABI,
+        functionName: "getMyTickets",
+      });
+
+      return this.toObject(ticketIds);
     } catch (error) {
       return error;
     }
