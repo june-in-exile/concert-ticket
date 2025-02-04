@@ -4,31 +4,19 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
 import {
-  chain,
-  rpcUrl,
   ticketId_pattern,
   address_pattern,
   invalid_ticketId_msg,
-  contract_address,
 } from "../constant";
-import {
-  createPublicClient,
-  createWalletClient,
-  getContract,
-  custom,
-  http,
-} from "viem";
 import RPC from ".././viemRPC";
-import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 
 export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState("");
   const [cancelledTicket, setCancelledTicket] = useState("");
   const [address, setAddress] = useState<`0x${string}`>("0x");
-  const [balance, setBalance] = useState("");
-  const [tickets, setTickets] = useState<BigInt[] | null>(null);
-  // const [contract, setContract] = useState(null);
+  const [balance, setBalance] = useState<string>("");
+  const [tickets, setTickets] = useState<string[] | null>(null);
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -81,7 +69,6 @@ export default function Ticket() {
       throw new Error("Provider not initialized yet");
     }
     const rpc = new RPC(provider);
-    // this function CANNOT show the balance of local node
     setBalance(await rpc.getBalance());
   };
 
@@ -102,7 +89,7 @@ export default function Ticket() {
     const ticketIds = await rpc.getMyTickets();
     if (ticketIds.length) {
       const validTickets = ticketIds.filter(
-        (ticketId) => ticketId !== BigInt(0),
+        (ticketId: string) => ticketId !== '0',
       );
       setTickets(validTickets.length ? validTickets : null);
     } else {
