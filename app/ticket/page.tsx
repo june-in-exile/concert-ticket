@@ -176,23 +176,17 @@ export default function Ticket() {
       }
       const ticketId = parseInt(validatedTicket);
 
-      if (!provider) {
-        throw new Error("Provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
-
       let isValid: boolean;
       try {
-        isValid = await rpc.isYourTicket(ticketId);
-        console.log("isValid = ", isValid);
-      } catch (error) {
-        if (error.message.includes("ERC721NonexistentToken")) {
-          isValid = false;
-        } else {
-          console.error(`Error while validating ticket: ${error.message}`);
-          alert(`Error while validating ticket.`);
-          return;
+        if (!provider) {
+          throw new Error("Provider not initialized yet");
         }
+        const rpc = new RPC(provider);
+        isValid = await rpc.isYourTicket(ticketId);
+      } catch (error) {
+        console.error(`Error while validating ticket: ${error.message}`);
+        alert(`Error while validating ticket.`);
+        return;
       }
       if (isValid) {
         alert(`Ticket ${validatedTicket} is VALID.`);
@@ -234,29 +228,18 @@ export default function Ticket() {
       let isValid: boolean;
       try {
         isValid = await rpc.isYourTicket(ticketId);
-      } catch (error) {
-        if (error.message.includes("ERC721NonexistentToken")) {
-          isValid = false;
-        } else {
-          console.error(`Error while validating ticket: ${error.message}`);
-          alert(`Error while validating ticket.`);
-          return;
-        }
-      }
-      try {
         if (!isValid) {
-          throw new Error(
-            `Ticket ${cancelledTicket} is NOT valid and cannot be cancelled.`,
-          );
+          alert("You are not the owner of this ticket");
+          return;
         }
         const transaction = await rpc.cancelTicket(ticketId);
         console.log("Transaction Mined", transaction);
         alert(`Ticket ${cancelledTicket} cancelled.`);
+        setCancelledTicket("");
       } catch (error) {
         console.error(`Error while cancelling ticket: ${error.message}`);
         alert(`Error while cancelling ticket.`);
       }
-      setCancelledTicket("");
       await Promise.all([showAddress(), showBalance(), showTickets()]);
     }
   };

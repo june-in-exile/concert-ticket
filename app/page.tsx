@@ -111,8 +111,8 @@ export default function Home() {
     };
 
     init();
-  }, []);
-
+    }, []);
+  
   useEffect(() => {
     if (loggedIn) {
       router.push("/ticket");

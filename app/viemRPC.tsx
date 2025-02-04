@@ -6,6 +6,7 @@ import {
   formatEther,
   parseEther,
   HttpTransport,
+  decodeErrorResult,
 } from "viem";
 import {
   arbitrum,
@@ -32,25 +33,14 @@ export default class EthereumRpc {
 
   constructor(provider: IProvider) {
     this.provider = provider;
-    if (chain == localhost) {
-      this.publicClient = createPublicClient({
-        chain,
-        transport: http("http://localhost:8545"),
-      });
-      this.walletClient = createWalletClient({
-        chain,
-        transport: http("http://localhost:8545"),
-      });
-    } else { 
-      this.publicClient = createPublicClient({
-        chain: this.getViewChain(),
-        transport: custom(this.provider),
-      });
-      this.walletClient = createWalletClient({
-        chain: this.getViewChain(),
-        transport: custom(this.provider),
-      });
-    }
+    this.publicClient = createPublicClient({
+      chain: this.getViewChain(),
+      transport: custom(this.provider),
+    });
+    this.walletClient = createWalletClient({
+      chain: this.getViewChain(),
+      transport: custom(this.provider),
+    });
   }
 
   getViewChain() {
@@ -204,7 +194,7 @@ export default class EthereumRpc {
 
       return this.toObject(receipt);
     } catch (error) {
-      return error;
+      throw new Error(error);
     }
   }
 
@@ -242,7 +232,7 @@ export default class EthereumRpc {
 
       return this.toObject(receipt);
     } catch (error) {
-      return error;
+      throw new Error(error);
     }
   }
 
@@ -256,7 +246,7 @@ export default class EthereumRpc {
 
       return this.toObject(ticketIds);
     } catch (error) {
-      return error;
+      throw new Error(error);
     }
   }
 
