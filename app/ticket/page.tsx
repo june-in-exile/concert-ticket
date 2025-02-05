@@ -32,10 +32,10 @@ export default function Ticket() {
           if (!provider) {
             throw new Error("Provider not initialized yet");
           }
-          await showAddress();
+          showAddress();
           showBalance();
           showTickets();
-          SetupEventListener(provider, loggedIn);
+          SetupEventListener(provider);
         } catch (error) {
           throw error;
         }
@@ -77,7 +77,9 @@ export default function Ticket() {
   const showTickets = async () => {
     const rpc = checkProviderAndRPC();
     const ticketIds = await rpc.getMyTickets();
-    const validTickets = ticketIds.filter((ticketId: string) => ticketId !== "0");
+    const validTickets = ticketIds.filter(
+      (ticketId: string) => ticketId !== "0",
+    );
     setTickets(validTickets.length ? validTickets : null);
   };
 
@@ -148,7 +150,11 @@ export default function Ticket() {
     try {
       const rpc = checkProviderAndRPC();
       const isValid = await rpc.isMyTicket(ticketId);
-      alert(isValid ? `Ticket ${validatedTicket} is VALID.` : `Ticket ${validatedTicket} is NOT valid.`);
+      alert(
+        isValid
+          ? `Ticket ${validatedTicket} is VALID.`
+          : `Ticket ${validatedTicket} is NOT valid.`,
+      );
     } catch (error) {
       throw error;
     }

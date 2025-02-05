@@ -73,9 +73,7 @@ export default class EthereumRpc {
   async getAccount(): Promise<any> {
     try {
       const addresses = this.walletClient.getAddresses();
-      return chain === anvil
-        ? w3a_account
-        : addresses[0];
+      return chain === anvil ? w3a_account : addresses[0];
     } catch (error) {
       throw error;
     }
@@ -189,9 +187,8 @@ export default class EthereumRpc {
   toObject(data: any) {
     // can't serialize a BigInt so this hack
     return JSON.parse(
-      JSON.stringify(
-        data,
-        (key, value) => (typeof value === "bigint" ? value.toString() : value),
+      JSON.stringify(data, (key, value) =>
+        typeof value === "bigint" ? value.toString() : value,
       ),
     );
   }
