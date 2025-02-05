@@ -74,6 +74,8 @@ and open [http://localhost:3000](http://localhost:3000) with your browser to see
 
 _(This step is required only for local testing.)_
 
+_(To interact with the actual Arbituem Sepolia, add `--rpc-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}` in the end of the command.)_
+
 ```bash
 $ source .env
 ```

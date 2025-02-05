@@ -16,12 +16,10 @@ contract TicketNFTTest is Test {
 
     function testValidateTicketsNotExist() public {
         vm.startPrank(alice);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
-        ticketNFT.isMyTicket(0);
+        assertFalse(ticketNFT.isMyTicket(0));
         vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
         ticketNFT.ownerOf(0);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
-        ticketNFT.isMyTicket(1);
+        assertFalse(ticketNFT.isMyTicket(1));
         vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
         ticketNFT.ownerOf(1);
         vm.stopPrank();
@@ -30,8 +28,7 @@ contract TicketNFTTest is Test {
     function testBuyTicket() public {
         vm.startPrank(alice);
         ticketNFT.buyTicket();
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
-        ticketNFT.isMyTicket(0);
+        assertFalse(ticketNFT.isMyTicket(0));
         assertTrue(ticketNFT.isMyTicket(1));
         vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
         ticketNFT.ownerOf(0);
@@ -62,8 +59,7 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket();
         assertTrue(ticketNFT.isMyTicket(1));
         ticketNFT.cancelTicket(1);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
-        ticketNFT.isMyTicket(1);
+        assertFalse(ticketNFT.isMyTicket(1));
         vm.stopPrank();
     }
 
@@ -79,11 +75,11 @@ contract TicketNFTTest is Test {
         vm.startPrank(alice);
         ticketNFT.buyTicket();
         ticketNFT.cancelTicket(1);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
+        vm.expectRevert("You are not the owner of this ticket");
         ticketNFT.cancelTicket(0);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
+        vm.expectRevert("You are not the owner of this ticket");
         ticketNFT.cancelTicket(1);
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 2));
+        vm.expectRevert("You are not the owner of this ticket");
         ticketNFT.cancelTicket(2);
         vm.stopPrank();
     }

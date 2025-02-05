@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TicketNFT is ERC721Enumerable, Ownable(msg.sender) {
+contract TicketNFT is ERC721, Ownable(msg.sender) {
     uint256 private _nextTokenId;
 
     event TicketBuyed(address indexed user, uint256 tokenId);
@@ -31,14 +30,18 @@ contract TicketNFT is ERC721Enumerable, Ownable(msg.sender) {
     }
 
     function isMyTicket(uint256 tokenId) public view returns (bool) {
-        return (ownerOf(tokenId) == msg.sender);
+        return (_ownerOf(tokenId) == msg.sender);
     }
 
     function getMyTickets() external view returns (uint256[] memory) {
         uint256 tokenCount = balanceOf(msg.sender);
         uint256[] memory ownedTickets = new uint256[](tokenCount);
-        for (uint256 i = 0; i < tokenCount; i++) {
-            ownedTickets[i] = tokenOfOwnerByIndex(msg.sender, i);
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 1; i < _nextTokenId; i++) {
+            if (isMyTicket(i)) {
+                ownedTickets[currentIndex++] = i;
+            }
         }
         return ownedTickets;
     }
