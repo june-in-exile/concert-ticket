@@ -23,6 +23,7 @@ export const ticketId_pattern = /^(?!0000)\d{4}$/;
 export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 export const invalid_ticketId_msg =
   "Ticket ID should be a nonzero 4-digit number.";
+export const invalid_owner_msg = "You are not the owner of this ticket.";
 
 // personal
 export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;

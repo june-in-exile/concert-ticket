@@ -3,9 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
-import { ticketId_pattern, invalid_ticketId_msg } from "../constant";
-import { SetupEventListener } from "./eventListener";
+import {
+  ticketId_pattern,
+  invalid_ticketId_msg,
+  invalid_owner_msg,
+  chain,
+  contract_address,
+} from "../constant";
+import { createPublicClient, http, custom } from "viem";
 import RPC from "./viemRPC";
+import { anvil } from "viem/chains";
+import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 
 export default function Ticket() {
   const router = useRouter();
@@ -25,17 +33,17 @@ export default function Ticket() {
     return new RPC(provider);
   };
 
+  const publicClient = createPublicClient({
+    chain,
+    transport: chain === anvil ? http() : custom(provider),
+  });
+
   useEffect(() => {
     const init = async () => {
       if (loggedIn) {
         try {
-          if (!provider) {
-            throw new Error("Provider not initialized yet");
-          }
-          showAddress();
-          showBalance();
-          showTickets();
-          SetupEventListener(provider);
+          const rpc = checkProviderAndRPC();
+          updateState(rpc);
         } catch (error) {
           throw error;
         }
@@ -46,10 +54,15 @@ export default function Ticket() {
     init();
   }, [router, loggedIn, provider]);
 
-  const showAddress = async () => {
-    const rpc = checkProviderAndRPC();
+  const updateState = async (rpc) => { 
     setAddress(await rpc.getAccount());
-  };
+    setBalance(await rpc.getBalance());
+    const ticketIds = await rpc.getMyTickets();
+    const validTickets = ticketIds.filter(
+      (ticketId: string) => ticketId !== "0",
+    );
+    setTickets(validTickets.length ? validTickets : null);
+  } 
 
   const addressText = (
     <p
@@ -60,11 +73,6 @@ export default function Ticket() {
     </p>
   );
 
-  const showBalance = async () => {
-    const rpc = checkProviderAndRPC();
-    setBalance(await rpc.getBalance());
-  };
-
   const balanceText = (
     <p
       id="balance"
@@ -73,15 +81,6 @@ export default function Ticket() {
       Your ETH Balance: {balance}
     </p>
   );
-
-  const showTickets = async () => {
-    const rpc = checkProviderAndRPC();
-    const ticketIds = await rpc.getMyTickets();
-    const validTickets = ticketIds.filter(
-      (ticketId: string) => ticketId !== "0",
-    );
-    setTickets(validTickets.length ? validTickets : null);
-  };
 
   const ticketText = (
     <p
@@ -94,9 +93,9 @@ export default function Ticket() {
 
   const logout = async () => {
     if (!web3Auth) {
-      console.log("web3auth not initialized yet");
+      throw new Error("web3auth not initialized yet");
       return;
-    }
+    };
     await web3Auth.logout();
     setLoggedIn(false);
     setProvider(null);
@@ -113,14 +112,32 @@ export default function Ticket() {
   );
 
   const buyTicket = async () => {
+    const rpc = checkProviderAndRPC();
     try {
-      const rpc = checkProviderAndRPC();
+      let debounceTimeout;
+
+      const unwatch = publicClient.watchContractEvent({
+        address: contract_address,
+        abi: ticketNFT.abi,
+        eventName: "TicketBought",
+        args: { from: address },
+        onLogs: (logs) => {
+          clearTimeout(debounceTimeout);
+          debounceTimeout = setTimeout(() => {
+            alert(
+              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
+            );
+            unwatch();
+          }, 100);
+        },
+      });
       const transaction = await rpc.buyTicket();
       console.log("Transaction Mined", transaction);
     } catch (error) {
       throw error;
-    }
-    await Promise.all([showAddress(), showBalance(), showTickets()]);
+    } finally { 
+      await updateState(rpc);
+    };
   };
 
   const buyTicketButton = (
@@ -143,7 +160,7 @@ export default function Ticket() {
     if (!ticketId_pattern.test(validatedTicket)) {
       alert(invalid_ticketId_msg);
       return;
-    }
+    };
 
     const ticketId = parseInt(validatedTicket);
 
@@ -157,8 +174,9 @@ export default function Ticket() {
       );
     } catch (error) {
       throw error;
-    }
-    setValidatedTicket("");
+    } finally {
+      setValidatedTicket("");
+    };
   };
 
   const validateTicketInput = (
@@ -182,24 +200,44 @@ export default function Ticket() {
     if (!ticketId_pattern.test(cancelledTicket)) {
       alert(invalid_ticketId_msg);
       return;
-    }
+    };
 
     const ticketId = parseInt(cancelledTicket);
+
+    const rpc = checkProviderAndRPC();
+
     try {
-      const rpc = checkProviderAndRPC();
+      let debounceTimeout;
+
+      const unwatch = publicClient.watchContractEvent({
+        address: contract_address,
+        abi: ticketNFT.abi,
+        eventName: "TicketCancelled",
+        args: { from: address },
+        onLogs: (logs) => {
+          clearTimeout(debounceTimeout);
+          debounceTimeout = setTimeout(() => {
+            alert(
+              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
+            );
+            unwatch();
+          }, 100);
+        },
+      });
+
       const isValid = await rpc.isMyTicket(ticketId);
       if (!isValid) {
-        alert("You are not the owner of this ticket.");
+        alert(invalid_owner_msg);
         return;
       }
       const transaction = await rpc.cancelTicket(ticketId);
       console.log("Transaction Mined", transaction);
     } catch (error) {
       throw error;
-    }
-
-    setCancelledTicket("");
-    await Promise.all([showAddress(), showBalance(), showTickets()]);
+    } finally {
+      setCancelledTicket("");
+      updateState(rpc);
+    };
   };
 
   const cancelTicketInput = (
