@@ -70,10 +70,20 @@ export default class EthereumRpc {
     }
   }
 
-  async getAccount(): Promise<any> {
+  async getAddresses(): Promise<any> {
     try {
-      const addresses = this.walletClient.getAddresses();
-      return chain === anvil ? w3a_account : addresses[0];
+      return chain === anvil
+        ? [w3a_account]
+        : await this.walletClient.getAddresses();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAccounts(): Promise<any> {
+    try {
+      const addresses = this.getAddresses();
+      return addresses;
     } catch (error) {
       throw error;
     }
@@ -95,9 +105,9 @@ export default class EthereumRpc {
 
   async getBalance(): Promise<string> {
     try {
-      const address = await this.getAccount();
+      const accounts = await this.getAccounts();
       const balance = await this.publicClient.getBalance({
-        address: address,
+        address: accounts[0],
       });
       return formatEther(balance);
     } catch (error) {
@@ -107,10 +117,9 @@ export default class EthereumRpc {
 
   async buyTicket() {
     try {
-      const account = await this.getAccount();
-
+      const accounts = await this.getAccounts();
       const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : account,
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "buyTicket",
@@ -129,10 +138,9 @@ export default class EthereumRpc {
 
   async cancelTicket(ticketId: number) {
     try {
-      const account = await this.getAccount();
-
+      const accounts = await this.getAccounts();
       const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : account,
+        account: chain === anvil ? undefined : accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "cancelTicket",
@@ -151,10 +159,9 @@ export default class EthereumRpc {
 
   async isMyTicket(ticketId: number) {
     try {
-      const account = await this.getAccount();
-
+      const accounts = await this.getAccounts();
       const isValid = await this.publicClient.readContract({
-        account: account,
+        account: accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "isMyTicket",
@@ -169,10 +176,9 @@ export default class EthereumRpc {
 
   async getMyTickets() {
     try {
-      const account = await this.getAccount();
-
+      const accounts = await this.getAccounts();
       const ticketIds = await this.publicClient.readContract({
-        account: account,
+        account: accounts[0],
         address: contract_address,
         abi: this.contractABI,
         functionName: "getMyTickets",
@@ -185,7 +191,6 @@ export default class EthereumRpc {
   }
 
   toObject(data: any) {
-    // can't serialize a BigInt so this hack
     return JSON.parse(
       JSON.stringify(data, (key, value) =>
         typeof value === "bigint" ? value.toString() : value,
