@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TicketNFT is ERC721, Ownable(msg.sender) {
     uint256 private _nextTokenId;
 
-    event TicketBuyed(address indexed user, uint256 tokenId);
+    event TicketBought(address indexed user, uint256 tokenId);
     event TicketCanceled(address indexed user, uint256 tokenId);
 
     constructor() ERC721("TicketNFT", "TNFT") {
@@ -19,7 +19,7 @@ contract TicketNFT is ERC721, Ownable(msg.sender) {
         _safeMint(msg.sender, tokenId);
         _nextTokenId++;
 
-        emit TicketBuyed(msg.sender, tokenId);
+        emit TicketBought(msg.sender, tokenId);
     }
 
     function cancelTicket(uint256 tokenId) external {

@@ -24,7 +24,7 @@ import {
   w3a_clientId,
   google_clientId,
 } from "./constant";
-// import RPC from "./viemRPC"; // for using viem
+// import RPC from "./ticket/viemRPC"; // for using viem
 import { arbitrumSepolia } from "viem/chains";
 
 export default function Home() {

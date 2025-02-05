@@ -16,13 +16,13 @@ import { privateKeyToAccount } from "viem/accounts";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IProvider } from "@web3auth/base";
-import ticketNFT from "../foundry/out/TicketNFT.sol/TicketNFT.json";
+import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 import {
   contract_address,
   w3a_account,
   w3a_private_key,
   chain,
-} from "./constant";
+} from "../constant";
 
 export default class EthereumRpc {
   private provider: IProvider;

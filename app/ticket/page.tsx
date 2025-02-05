@@ -3,12 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
-import {
-  ticketId_pattern,
-  address_pattern,
-  invalid_ticketId_msg,
-} from "../constant";
-import RPC from ".././viemRPC";
+import { ticketId_pattern, invalid_ticketId_msg } from "../constant";
+import { SetupEventListener } from "./eventListener";
+import RPC from "./viemRPC";
 
 export default function Ticket() {
   const router = useRouter();
@@ -22,30 +19,18 @@ export default function Ticket() {
   const { loggedIn, setLoggedIn } = useLoggedIn();
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        showAddress();
-        showBalance();
-        showTickets();
-      } catch (error) {
-        console.error(error);
+    if (loggedIn) {
+      if (!provider) {
+        throw new Error("Provider not initialized yet");
       }
-    };
-
-    init();
-  }, [provider]);
-
-  useEffect(() => {
-    if (!loggedIn) {
+      SetupEventListener(provider, loggedIn);
+      showAddress();
+      showBalance();
+      showTickets();
+    } else {
       router.push(`/`);
     }
-  }, [router, loggedIn]);
-
-  useEffect(() => {
-    if (address && !address_pattern.test(address)) {
-      setAddress(null);
-    }
-  }, [address]);
+  }, [router, loggedIn, provider]);
 
   const showAddress = async () => {
     if (!provider) {
