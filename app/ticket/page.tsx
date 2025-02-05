@@ -9,8 +9,8 @@ import RPC from "./viemRPC";
 
 export default function Ticket() {
   const router = useRouter();
-  const [validatedTicket, setValidatedTicket] = useState("");
-  const [cancelledTicket, setCancelledTicket] = useState("");
+  const [validatedTicket, setValidatedTicket] = useState<string>("");
+  const [cancelledTicket, setCancelledTicket] = useState<string>("");
   const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState<string>("");
   const [tickets, setTickets] = useState<string[] | null>(null);
@@ -18,26 +18,37 @@ export default function Ticket() {
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
 
-  useEffect(() => {
-    if (loggedIn) {
-      if (!provider) {
-        throw new Error("Provider not initialized yet");
-      }
-      SetupEventListener(provider, loggedIn);
-      showAddress();
-      showBalance();
-      showTickets();
-    } else {
-      router.push(`/`);
-    }
-  }, [router, loggedIn, provider]);
-
-  const showAddress = async () => {
+  const checkProviderAndRPC = () => {
     if (!provider) {
       throw new Error("Provider not initialized yet");
     }
-    const rpc = new RPC(provider);
-    setAddress(await rpc.getAccounts());
+    return new RPC(provider);
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      if (loggedIn) {
+        try {
+          if (!provider) {
+            throw new Error("Provider not initialized yet");
+          }
+          await showAddress();
+          showBalance();
+          showTickets();
+          SetupEventListener(provider, loggedIn);
+        } catch (error) {
+          throw error;
+        }
+      } else {
+        router.push(`/`);
+      }
+    };
+    init();
+  }, [router, loggedIn, provider]);
+
+  const showAddress = async () => {
+    const rpc = checkProviderAndRPC();
+    setAddress(await rpc.getAccount());
   };
 
   const addressText = (
@@ -50,10 +61,7 @@ export default function Ticket() {
   );
 
   const showBalance = async () => {
-    if (!provider) {
-      throw new Error("Provider not initialized yet");
-    }
-    const rpc = new RPC(provider);
+    const rpc = checkProviderAndRPC();
     setBalance(await rpc.getBalance());
   };
 
@@ -67,19 +75,10 @@ export default function Ticket() {
   );
 
   const showTickets = async () => {
-    if (!provider) {
-      throw new Error("Provider not initialized yet");
-    }
-    const rpc = new RPC(provider);
+    const rpc = checkProviderAndRPC();
     const ticketIds = await rpc.getMyTickets();
-    if (ticketIds.length) {
-      const validTickets = ticketIds.filter(
-        (ticketId: string) => ticketId !== "0",
-      );
-      setTickets(validTickets.length ? validTickets : null);
-    } else {
-      setTickets(null);
-    }
+    const validTickets = ticketIds.filter((ticketId: string) => ticketId !== "0");
+    setTickets(validTickets.length ? validTickets : null);
   };
 
   const ticketText = (
@@ -113,15 +112,11 @@ export default function Ticket() {
 
   const buyTicket = async () => {
     try {
-      if (!provider) {
-        throw new Error("Provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
+      const rpc = checkProviderAndRPC();
       const transaction = await rpc.buyTicket();
       console.log("Transaction Mined", transaction);
     } catch (error) {
-      console.error(`Error while buying ticket: ${error.message}`);
-      alert(`Error while buying ticket.`);
+      throw error;
     }
     await Promise.all([showAddress(), showBalance(), showTickets()]);
   };
@@ -141,31 +136,23 @@ export default function Ticket() {
   };
 
   const validateTicket = async (event) => {
-    if (event.key === "Enter") {
-      if (!ticketId_pattern.test(validatedTicket)) {
-        alert(invalid_ticketId_msg);
-        return;
-      }
-      const ticketId = parseInt(validatedTicket);
+    if (event.key !== "Enter") return;
 
-      try {
-        if (!provider) {
-          throw new Error("Provider not initialized yet");
-        }
-        const rpc = new RPC(provider);
-        const isValid = await rpc.isMyTicket(ticketId);
-        if (isValid) {
-          alert(`Ticket ${validatedTicket} is VALID.`);
-        } else {
-          alert(`Ticket ${validatedTicket} is NOT valid.`);
-        }
-      } catch (error) {
-        console.error(`Error while validating ticket: ${error.message}`);
-        alert(`Error while validating ticket.`);
-        return;
-      }
-      setValidatedTicket("");
+    if (!ticketId_pattern.test(validatedTicket)) {
+      alert(invalid_ticketId_msg);
+      return;
     }
+
+    const ticketId = parseInt(validatedTicket);
+
+    try {
+      const rpc = checkProviderAndRPC();
+      const isValid = await rpc.isMyTicket(ticketId);
+      alert(isValid ? `Ticket ${validatedTicket} is VALID.` : `Ticket ${validatedTicket} is NOT valid.`);
+    } catch (error) {
+      throw error;
+    }
+    setValidatedTicket("");
   };
 
   const validateTicketInput = (
@@ -184,32 +171,29 @@ export default function Ticket() {
   };
 
   const cancelTicket = async (event) => {
-    if (event.key === "Enter") {
-      if (!ticketId_pattern.test(cancelledTicket)) {
-        alert(invalid_ticketId_msg);
+    if (event.key !== "Enter") return;
+
+    if (!ticketId_pattern.test(cancelledTicket)) {
+      alert(invalid_ticketId_msg);
+      return;
+    }
+
+    const ticketId = parseInt(cancelledTicket);
+    try {
+      const rpc = checkProviderAndRPC();
+      const isValid = await rpc.isMyTicket(ticketId);
+      if (!isValid) {
+        alert("You are not the owner of this ticket.");
         return;
       }
-      const ticketId = parseInt(cancelledTicket);
-      try {
-        if (!provider) {
-          throw new Error("Provider not initialized yet");
-        }
-        const rpc = new RPC(provider);
-        const isValid = await rpc.isMyTicket(ticketId);
-        if (!isValid) {
-          alert("You are not the owner of this ticket");
-          return;
-        }
-        const transaction = await rpc.cancelTicket(ticketId);
-        console.log("Transaction Mined", transaction);
-        alert(`Ticket ${cancelledTicket} cancelled.`);
-      } catch (error) {
-        console.error(`Error while cancelling ticket: ${error.message}`);
-        alert(`Error while cancelling ticket.`);
-      }
-      setCancelledTicket("");
-      await Promise.all([showAddress(), showBalance(), showTickets()]);
+      const transaction = await rpc.cancelTicket(ticketId);
+      console.log("Transaction Mined", transaction);
+    } catch (error) {
+      throw error;
     }
+
+    setCancelledTicket("");
+    await Promise.all([showAddress(), showBalance(), showTickets()]);
   };
 
   const cancelTicketInput = (

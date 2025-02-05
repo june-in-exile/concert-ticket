@@ -20,6 +20,7 @@ export const arb_sepolia_chainId = process.env.NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID;
 export const contract_address = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
 export const ticketId_pattern = /^(?!0000)\d{4}$/;
+export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 export const invalid_ticketId_msg =
   "Ticket ID should be a nonzero 4-digit number.";
 
