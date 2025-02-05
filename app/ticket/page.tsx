@@ -89,7 +89,7 @@ export default function Ticket() {
     const ticketIds = await rpc.getMyTickets();
     if (ticketIds.length) {
       const validTickets = ticketIds.filter(
-        (ticketId: string) => ticketId !== '0',
+        (ticketId: string) => ticketId !== "0",
       );
       setTickets(validTickets.length ? validTickets : null);
     } else {

@@ -137,24 +137,6 @@ export default class EthereumRpc {
     }
   }
 
-  async isMyTicket(ticketId: number) {
-    try {
-      const accounts = await this.getAccounts();
-
-      const isValid = await this.publicClient.readContract({
-        account: accounts[0],
-        address: contract_address,
-        abi: this.contractABI,
-        functionName: "isMyTicket",
-        args: [ticketId],
-      });
-
-      return this.toObject(isValid);
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
   async cancelTicket(ticketId: number) {
     try {
       const accounts = await this.getAccounts();
@@ -172,6 +154,24 @@ export default class EthereumRpc {
       });
 
       return this.toObject(receipt);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async isMyTicket(ticketId: number) {
+    try {
+      const accounts = await this.getAccounts();
+
+      const isValid = await this.publicClient.readContract({
+        account: accounts[0],
+        address: contract_address,
+        abi: this.contractABI,
+        functionName: "isMyTicket",
+        args: [ticketId],
+      });
+
+      return this.toObject(isValid);
     } catch (error) {
       throw new Error(error);
     }

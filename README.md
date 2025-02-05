@@ -68,19 +68,17 @@ Run the development server:
 $ npm run dev
 ```
 
-and open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+and open [http://localhost:3000](http://localhost:3000) with your browser to see the result. After logging, fill the `NEXT_PUBLIC_W3A_ACCOUNT` field in `.env` with your Web3Auth address.
 
-## 5. Send Tokens on Forked Arbitrum Sepolia
+## 5. Interact with the Contract on Forked Arbitrum Sepolia
 
 _(This step is required only for local testing.)_
-
-After logging, fill the `NEXT_PUBLIC_W3A_ACCOUNT` field in `.env` with your address created through Gmail (which you can get from the URL) and run
 
 ```bash
 $ source .env
 ```
 
-Send 1 ETH to your account created through Gmail:
+Send 1 ETH from Alice (a simulated account in Anvil) to your Web3Auth account:
 
 ```bash
 $ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_W3A_ACCOUNT} --value 1ether
@@ -92,14 +90,52 @@ Check your ETH balance:
 $ cast balance ${NEXT_PUBLIC_W3A_ACCOUNT}
 ```
 
-Send 10 USDC:
+Buy ticket
 
 ```bash
-$ cast rpc anvil_impersonateAccount ${NEXT_PUBLIC_ANVIL_ALICE}
+$ cast send --from ${NEXT_PUBLIC_W3A_ACCOUNT} --private-key ${NEXT_PUBLIC_W3A_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "buyTicket()"
 ```
 
-Check your USDC balance:
+Validate the ticket
 
 ```bash
-$ cast call ${NEXT_PUBLIC_USDC} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_W3A_ACCOUNT}
+$ cast call --from ${NEXT_PUBLIC_W3A_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "isMyTicket(uint256)(bool)" <tokenId>
+```
+
+Cancel the ticket
+
+```bash
+$ cast send --from ${NEXT_PUBLIC_W3A_ACCOUNT} --private-key ${NEXT_PUBLIC_W3A_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "cancelTicket(uint256)" <tokenId>
+```
+
+Get your tickets
+
+```bash
+$ cast call --from ${NEXT_PUBLIC_W3A_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "getMyTickets()(uint256[])"
+```
+
+Check your number of tickets
+
+```bash
+$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_W3A_ACCOUNT}
+```
+
+Check the owner of a ticket:
+
+```bash
+$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "ownerOf(uint256)(address)" <tokenId>
+```
+
+Check the name of the Ticket NFT:
+
+```bash
+$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "name()(string)"
+# "TicketNFT"
+```
+
+Check the symbol of the Ticket NFT:
+
+```bash
+$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "symbol()(string)"
+# "TNFT"
 ```
