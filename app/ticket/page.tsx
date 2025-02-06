@@ -13,7 +13,7 @@ import {
   confirm_buy_msg,
   confirm_cancel_msg,
 } from "../constant";
-import { createPublicClient, http, custom } from "viem";
+import { createPublicClient, http } from "viem";
 import RPC from "./viemRPC";
 import { anvil } from "viem/chains";
 import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
@@ -36,13 +36,27 @@ export default function Ticket() {
     return new RPC(provider);
   };
 
-  const checkProviderAndPublicClient = async () => {
-    if (!provider) {
-      throw new Error("Provider not initialized yet");
-    }
-    return createPublicClient({
+  const watchEvent = (eventName) => {
+    const publicClient = createPublicClient({
       chain,
       transport: chain === anvil ? http() : http(rpcUrl),
+    });
+    let debounceTimeout;
+    const unwatch = publicClient.watchContractEvent({
+      address: contract_address,
+      abi: ticketNFT.abi,
+      eventName,
+      args: { from: address },
+      onLogs: (logs) => {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+          alert(
+            `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
+          );
+          updateState()
+          unwatch();
+        }, 100);
+      },
     });
   };
 
@@ -50,8 +64,7 @@ export default function Ticket() {
     const init = async () => {
       if (loggedIn) {
         try {
-          const rpc = await checkProviderAndRPC();
-          await updateState(rpc);
+          await updateState();
         } catch (error) {
           throw error;
         }
@@ -62,8 +75,9 @@ export default function Ticket() {
     init();
   }, [router, loggedIn, provider]);
 
-  const updateState = async (rpc) => {
-    setAddress(await rpc.getAccounts()[0]);
+  const updateState = async () => {
+    const rpc = await checkProviderAndRPC();
+    setAddress(await rpc.getAccount());
     setBalance(await rpc.getBalance());
     setTickets(await rpc.getMyTickets());
   };
@@ -80,38 +94,26 @@ export default function Ticket() {
   const buyTicket = async () => {
     if (!confirm(confirm_buy_msg)) return;
     try {
-      const publicClient = await checkProviderAndPublicClient();
-      let debounceTimeout;
-      const unwatch = publicClient.watchContractEvent({
-        address: contract_address,
-        abi: ticketNFT.abi,
-        eventName: "TicketBought",
-        args: { from: address },
-        onLogs: (logs) => {
-          clearTimeout(debounceTimeout);
-          debounceTimeout = setTimeout(() => {
-            alert(
-              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
-            );
-            unwatch();
-          }, 100);
-        },
-      });
+      watchEvent("TicketBought");
       const rpc = await checkProviderAndRPC();
       const transaction = await rpc.buyTicket();
       console.log("Transaction Mined", transaction);
-      updateState(rpc);
     } catch (error) {
       throw error;
     } finally {
+      updateState();
     }
   };
 
-  const updateValidatedTicket = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateValidatedTicket = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setValidatedTicket(event.target.value);
   };
 
-  const validateTicket = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const validateTicket = async (
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
     if (event.key !== "Enter") return;
 
     if (!ticketId_pattern.test(validatedTicket)) {
@@ -133,10 +135,13 @@ export default function Ticket() {
       throw error;
     } finally {
       setValidatedTicket("");
+      updateState();
     }
   };
 
-  const updateCancelledTicket = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const updateCancelledTicket = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setCancelledTicket(event.target.value);
   };
 
@@ -153,23 +158,7 @@ export default function Ticket() {
     const ticketId = parseInt(cancelledTicket);
 
     try {
-      const publicClient = await checkProviderAndPublicClient();
-      let debounceTimeout;
-      const unwatch = publicClient.watchContractEvent({
-        address: contract_address,
-        abi: ticketNFT.abi,
-        eventName: "TicketCancelled",
-        args: { from: address },
-        onLogs: (logs) => {
-          clearTimeout(debounceTimeout);
-          debounceTimeout = setTimeout(() => {
-            alert(
-              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
-            );
-            unwatch();
-          }, 100);
-        },
-      });
+      watchEvent("TicketCancelled");
       const rpc = await checkProviderAndRPC();
       const isValid = await rpc.isMyTicket(ticketId);
       if (!isValid) {
@@ -178,11 +167,11 @@ export default function Ticket() {
       }
       const transaction = await rpc.cancelTicket(ticketId);
       console.log("Transaction Mined", transaction);
-      updateState(rpc);
     } catch (error) {
       throw error;
     } finally {
       setCancelledTicket("");
+      updateState();
     }
   };
 
@@ -196,6 +185,28 @@ export default function Ticket() {
       >
         Logout
       </button>
+
+      {/* top left */}
+      <p /* top */
+        id="address"
+        className="absolute top-8 left-0 m-6 text-foreground text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 text-2xl"
+      >
+        Address: {address}
+      </p>
+      <p /*  center */
+        id="balance"
+        className="absolute top-14 left-0 m-6 text-foreground text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 text-2xl"
+      >
+        ETH Balance: {balance}
+      </p>
+      <p /*  bottom */
+        id="ticket"
+        className="absolute top-20 left-0 m-6 text-foreground text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 text-2xl"
+      >
+        {tickets.length
+          ? `Tickets: ${tickets.map((ticket) => ticket.padStart(4, "0")).join(", ")}`
+          : `No Tickets Yet`}
+      </p>
 
       {/* center */}
       <button /* top */
@@ -221,26 +232,6 @@ export default function Ticket() {
         onChange={updateCancelledTicket}
         onKeyDown={cancelTicket}
       />
-
-      {/* bottom right */}
-      <p /* top */
-        id="address"
-        className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-12 right-0 m-6 text-2xl"
-      >
-        Your Address: {address}
-      </p>
-      <p /*  center */
-        id="balance"
-        className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-6 right-0 m-6 text-2xl"
-      >
-        Your ETH Balance: {balance}
-      </p>
-      <p /*  bottom */
-        id="ticket"
-        className="flex items-center justify-center text-foreground gap-2 text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 group absolute bottom-0 right-0 m-6 text-2xl"
-      >
-        {tickets.length ? `Your Tickets: ${tickets.map(ticket => ticket.padStart(4, '0')).join(", ")}` : `No Tickets Yet`}
-      </p>
     </div>
   );
 }

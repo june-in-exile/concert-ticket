@@ -23,8 +23,7 @@ export const contract_address = process.env
 export const ticketId_pattern = /^(?!0000)\d{4}$/;
 export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 
-export const alert_ticketId_msg =
-  "Ticket ID is a nonzero 4-digit number.";
+export const alert_ticketId_msg = "Ticket ID is a nonzero 4-digit number.";
 export const alert_owner_msg = "You are not the owner of this ticket.";
 export const confirm_buy_msg = "Are you sure you want to buy a ticket?";
 export const confirm_cancel_msg = "Are you sure you want to cancel the ticket?";

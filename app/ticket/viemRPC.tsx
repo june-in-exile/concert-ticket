@@ -82,8 +82,17 @@ export default class EthereumRpc {
 
   async getAccounts(): Promise<any> {
     try {
-      const addresses = this.getAddresses();
+      const addresses = await this.getAddresses();
       return addresses;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAccount(): Promise<any> {
+    try {
+      const accounts = await this.getAccounts();
+      return accounts[0];
     } catch (error) {
       throw error;
     }
