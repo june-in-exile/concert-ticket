@@ -104,65 +104,6 @@ export default class EthereumRpc {
     }
   }
 
-  async buyTicket() {
-    try {
-      const account = await this.getAccount();
-      const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : account,
-        address: contract_address,
-        abi: this.contractABI,
-        functionName: "buyTicket",
-        args: [],
-      });
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({
-        hash,
-      });
-
-      return this.toObject(receipt);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async cancelTicket(ticketId: number) {
-    try {
-      const account = await this.getAccount();
-      const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : account,
-        address: contract_address,
-        abi: this.contractABI,
-        functionName: "cancelTicket",
-        args: [ticketId],
-      });
-
-      const receipt = await this.publicClient.waitForTransactionReceipt({
-        hash,
-      });
-
-      return this.toObject(receipt);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async isMyTicket(ticketId: number) {
-    try {
-      const account = await this.getAccount();
-      const isValid = await this.publicClient.readContract({
-        account,
-        address: contract_address,
-        abi: this.contractABI,
-        functionName: "isMyTicket",
-        args: [ticketId],
-      });
-
-      return this.toObject(isValid);
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getMyTickets() {
     try {
       const account = await this.getAccount();

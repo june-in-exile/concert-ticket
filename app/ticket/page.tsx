@@ -14,12 +14,7 @@ import {
   confirm_buy_msg,
   confirm_cancel_msg,
 } from "../constant";
-import {
-  createWalletClient,
-  getContract,
-  http,
-  publicActions,
-} from "viem";
+import { createWalletClient, getContract, http, publicActions } from "viem";
 import RPC from "./viemRPC";
 import { anvil } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
@@ -43,8 +38,9 @@ export default function Ticket() {
         try {
           let privateKey = w3a_private_key;
           if (chain !== anvil) {
-            privateKey = '0x' + (await provider.request({ method: "eth_private_key" }))
-          };
+            privateKey =
+              "0x" + (await provider.request({ method: "eth_private_key" }));
+          }
 
           const walletClient = createWalletClient({
             account: privateKeyToAccount(privateKey),
@@ -75,22 +71,30 @@ export default function Ticket() {
 
   useEffect(() => {
     if (contract && address) {
-      contract.watchEvent.TicketBought({
-        from: address,
-      },
+      contract.watchEvent.TicketBought(
         {
-          onLogs: (logs) => { alert(`Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`) }
-        })
-      contract.watchEvent.TicketCancelled({
-        from: address,
-      },
+          from: address,
+        },
+        {
+          onLogs: (logs) => {
+            alert(
+              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
+            );
+          },
+        },
+      );
+      contract.watchEvent.TicketCancelled(
+        {
+          from: address,
+        },
         {
           onLogs: (logs) => {
             alert(
               `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
-            )
-          }
-        })
+            );
+          },
+        },
+      );
     }
   }, [address, contract]);
 
