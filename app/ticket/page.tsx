@@ -13,11 +13,9 @@ import {
   alert_owner_msg,
   confirm_buy_msg,
   confirm_cancel_msg,
-  Event,
 } from "../constant";
 import {
   createWalletClient,
-  createPublicClient,
   getContract,
   http,
   publicActions,
@@ -39,49 +37,14 @@ export default function Ticket() {
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
 
-  const watchEvent = (eventName: Event) => {
-    const publicClient = createPublicClient({
-      chain,
-      transport: chain === anvil ? http() : http(rpcUrl),
-    });
-    let debounceTimeout;
-    const unwatch = publicClient.watchContractEvent({
-      address: contract_address,
-      abi: ticketNFT.abi,
-      eventName,
-      args: { from: address },
-      onLogs: (logs) => {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => {
-          switch (eventName) {
-            case Event.Bought:
-              alert(
-                `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
-              );
-              break;
-            case Event.Cancelled:
-              alert(
-                `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
-              );
-              break;
-            default:
-              console.log("Unknown Event.");
-          }
-          updateState();
-          unwatch();
-        }, 100);
-      },
-    });
-  };
-
   useEffect(() => {
     const init = async () => {
       if (loggedIn) {
         try {
-          const privateKey: `0x${string}` = (chain === anvil) ? w3a_private_key :
-            '0x' + await provider.request({
-              method: "eth_private_key",
-            });
+          let privateKey = w3a_private_key;
+          if (chain !== anvil) {
+            privateKey = '0x' + (await provider.request({ method: "eth_private_key" }))
+          };
 
           const walletClient = createWalletClient({
             account: privateKeyToAccount(privateKey),
@@ -110,6 +73,27 @@ export default function Ticket() {
     init();
   }, [router, loggedIn, provider]);
 
+  useEffect(() => {
+    if (contract && address) {
+      contract.watchEvent.TicketBought({
+        from: address,
+      },
+        {
+          onLogs: (logs) => { alert(`Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`) }
+        })
+      contract.watchEvent.TicketCancelled({
+        from: address,
+      },
+        {
+          onLogs: (logs) => {
+            alert(
+              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
+            )
+          }
+        })
+    }
+  }, [address, contract]);
+
   const updateState = async () => {
     if (!provider) {
       throw new Error("Provider not initialized yet");
@@ -132,7 +116,6 @@ export default function Ticket() {
   const buyTicket = async () => {
     if (!confirm(confirm_buy_msg)) return;
     try {
-      watchEvent(Event.Bought);
       const transaction = await contract.write.buyTicket();
       console.log("Transaction of buyTicket:", transaction);
     } catch (error) {
@@ -194,7 +177,6 @@ export default function Ticket() {
     const ticketId = parseInt(cancelledTicket);
 
     try {
-      watchEvent(Event.Cancelled);
       const isValid = await contract.read.isMyTicket([ticketId]);
       if (!isValid) {
         alert(alert_owner_msg);
