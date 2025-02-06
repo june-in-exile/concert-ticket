@@ -19,7 +19,8 @@ import {
   createWalletClient,
   createPublicClient,
   getContract,
-  http
+  http,
+  publicActions,
 } from "viem";
 import RPC from "./viemRPC";
 import { anvil } from "viem/chains";
@@ -37,18 +38,6 @@ export default function Ticket() {
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
-
-  const checkProviderAndRPC = async () => {
-    if (!provider) {
-      throw new Error("Provider not initialized yet");
-    }
-    return new RPC(provider);
-  };
-
-
-
-
-
 
   const watchEvent = (eventName: Event) => {
     const publicClient = createPublicClient({
@@ -68,7 +57,7 @@ export default function Ticket() {
             case Event.Bought:
               alert(
                 `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
-              )
+              );
               break;
             case Event.Cancelled:
               alert(
@@ -89,33 +78,26 @@ export default function Ticket() {
     const init = async () => {
       if (loggedIn) {
         try {
-          // const publicClient = createPublicClient({
-          //   chain,
-          //   transport: http(rpcUrl),
-          // });
+          const privateKey: `0x${string}` = (chain === anvil) ? w3a_private_key :
+            '0x' + await provider.request({
+              method: "eth_private_key",
+            });
 
-          // let privateKey: `0x${string}`;
-          // if (chain === anvil) {
-          //   privateKey = w3a_private_key;
-          // } else {
-          //   const prePrivateKey = await provider.request({ method: "eth_private_key" })
-          //   privateKey = '0x' + prePrivateKey;
-          // }
+          const walletClient = createWalletClient({
+            account: privateKeyToAccount(privateKey),
+            chain,
+            transport: http(rpcUrl),
+          });
 
-          // const walletClient = createWalletClient({
-          //   account: privateKeyToAccount(privateKey as `0x${string}`),
-          //   chain,
-          //   transport: http(rpcUrl),
-          //   // transport: chain === anvil ? http() : custom(this.provider),
-          // });
+          const publicClient = walletClient.extend(publicActions);
 
-          // const contract = getContract({
-          //   address: contract_address,
-          //   abi: ticketNFT.abi,
-          //   client: { public: this.publicClient, wallet: this.walletClient }
-          // })
+          const contract = getContract({
+            address: contract_address,
+            abi: ticketNFT.abi,
+            client: { public: publicClient, wallet: walletClient },
+          });
 
-          // setContract(contract);
+          setContract(contract);
 
           await updateState();
         } catch (error) {
@@ -129,7 +111,10 @@ export default function Ticket() {
   }, [router, loggedIn, provider]);
 
   const updateState = async () => {
-    const rpc = await checkProviderAndRPC();
+    if (!provider) {
+      throw new Error("Provider not initialized yet");
+    }
+    const rpc = new RPC(provider);
     setAddress(await rpc.getAccount());
     setBalance(await rpc.getBalance());
     setTickets(await rpc.getMyTickets());
@@ -148,9 +133,8 @@ export default function Ticket() {
     if (!confirm(confirm_buy_msg)) return;
     try {
       watchEvent(Event.Bought);
-      const rpc = await checkProviderAndRPC();
-      const transaction = await rpc.buyTicket();
-      console.log("Transaction Mined", transaction);
+      const transaction = await contract.write.buyTicket();
+      console.log("Transaction of buyTicket:", transaction);
     } catch (error) {
       throw error;
     } finally {
@@ -177,8 +161,7 @@ export default function Ticket() {
     const ticketId = parseInt(validatedTicket);
 
     try {
-      const rpc = await checkProviderAndRPC();
-      const isValid = await rpc.isMyTicket(ticketId);
+      const isValid = await contract.read.isMyTicket([ticketId]);
       alert(
         isValid
           ? `Ticket ${validatedTicket} is VALID.`
@@ -212,14 +195,13 @@ export default function Ticket() {
 
     try {
       watchEvent(Event.Cancelled);
-      const rpc = await checkProviderAndRPC();
-      const isValid = await rpc.isMyTicket(ticketId);
+      const isValid = await contract.read.isMyTicket([ticketId]);
       if (!isValid) {
         alert(alert_owner_msg);
         return;
       }
-      const transaction = await rpc.cancelTicket(ticketId);
-      console.log("Transaction Mined", transaction);
+      const transaction = await contract.write.cancelTicket([ticketId]);
+      console.log("Transaction of cancelTicket:", transaction);
     } catch (error) {
       throw error;
     } finally {
