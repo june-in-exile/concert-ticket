@@ -19,11 +19,15 @@ export { chain, rpcUrl };
 export const arb_sepolia_chainId = process.env.NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID;
 export const contract_address = process.env
   .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+
 export const ticketId_pattern = /^(?!0000)\d{4}$/;
 export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
-export const invalid_ticketId_msg =
-  "Ticket ID should be a nonzero 4-digit number.";
-export const invalid_owner_msg = "You are not the owner of this ticket.";
+
+export const alert_ticketId_msg =
+  "Ticket ID is a nonzero 4-digit number.";
+export const alert_owner_msg = "You are not the owner of this ticket.";
+export const confirm_buy_msg = "Are you sure you want to buy a ticket?";
+export const confirm_cancel_msg = "Are you sure you want to cancel the ticket?";
 
 // personal
 export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;
