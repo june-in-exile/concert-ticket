@@ -6,6 +6,7 @@ import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
 import {
   chain,
   rpcUrl,
+  w3a_private_key,
   contract_address,
   ticketId_pattern,
   alert_ticketId_msg,
@@ -14,9 +15,15 @@ import {
   confirm_cancel_msg,
   Event,
 } from "../constant";
-import { createPublicClient, http } from "viem";
+import {
+  createWalletClient,
+  createPublicClient,
+  getContract,
+  http
+} from "viem";
 import RPC from "./viemRPC";
 import { anvil } from "viem/chains";
+import { privateKeyToAccount } from "viem/accounts";
 import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
 
 export default function Ticket() {
@@ -26,6 +33,7 @@ export default function Ticket() {
   const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState<string>("");
   const [tickets, setTickets] = useState<string[]>([]);
+  const [contract, setContract] = useState(null);
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
   const { loggedIn, setLoggedIn } = useLoggedIn();
@@ -36,6 +44,11 @@ export default function Ticket() {
     }
     return new RPC(provider);
   };
+
+
+
+
+
 
   const watchEvent = (eventName: Event) => {
     const publicClient = createPublicClient({
@@ -76,6 +89,34 @@ export default function Ticket() {
     const init = async () => {
       if (loggedIn) {
         try {
+          // const publicClient = createPublicClient({
+          //   chain,
+          //   transport: http(rpcUrl),
+          // });
+
+          // let privateKey: `0x${string}`;
+          // if (chain === anvil) {
+          //   privateKey = w3a_private_key;
+          // } else {
+          //   const prePrivateKey = await provider.request({ method: "eth_private_key" })
+          //   privateKey = '0x' + prePrivateKey;
+          // }
+
+          // const walletClient = createWalletClient({
+          //   account: privateKeyToAccount(privateKey as `0x${string}`),
+          //   chain,
+          //   transport: http(rpcUrl),
+          //   // transport: chain === anvil ? http() : custom(this.provider),
+          // });
+
+          // const contract = getContract({
+          //   address: contract_address,
+          //   abi: ticketNFT.abi,
+          //   client: { public: this.publicClient, wallet: this.walletClient }
+          // })
+
+          // setContract(contract);
+
           await updateState();
         } catch (error) {
           throw error;

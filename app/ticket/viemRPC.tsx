@@ -74,9 +74,7 @@ export default class EthereumRpc {
   async getAccount(): Promise<any> {
     try {
       const addresses = await this.walletClient.getAddresses();
-      return chain === anvil
-        ? w3a_account
-        : addresses[0];
+      return chain === anvil ? w3a_account : addresses[0];
     } catch (error) {
       throw error;
     }
@@ -84,10 +82,11 @@ export default class EthereumRpc {
 
   async getPrivateKey(): Promise<any> {
     try {
-      return chain === anvil ? w3a_private_key :
-        await this.provider.request({
-          method: "eth_private_key",
-        });
+      return chain === anvil
+        ? w3a_private_key
+        : await this.provider.request({
+            method: "eth_private_key",
+          });
     } catch (error) {
       throw error;
     }
