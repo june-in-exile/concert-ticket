@@ -163,6 +163,7 @@ export default function Ticket() {
     event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (event.key !== "Enter") return;
+    setValidatedTicket("");
 
     if (!ticketId_pattern.test(validatedTicket)) {
       alert(alert_ticketId_msg);
@@ -181,7 +182,6 @@ export default function Ticket() {
     } catch (error) {
       throw error;
     } finally {
-      setValidatedTicket("");
       updateState();
     }
   };
@@ -201,6 +201,7 @@ export default function Ticket() {
     }
 
     if (!confirm(confirm_cancel_msg)) return;
+    setCancelledTicket("");
 
     const ticketId = parseInt(cancelledTicket);
 
@@ -215,7 +216,6 @@ export default function Ticket() {
     } catch (error) {
       throw error;
     } finally {
-      setCancelledTicket("");
       updateState();
     }
   };
