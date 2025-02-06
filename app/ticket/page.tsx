@@ -23,7 +23,7 @@ import {
 } from "viem";
 import { anvil } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
-import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
+import ticketNFT from "./TicketNFT.json";
 
 export default function Ticket() {
   const router = useRouter();

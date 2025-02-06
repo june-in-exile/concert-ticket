@@ -58,9 +58,14 @@ $ cd foundry \
 >     script/ticketNFT.deploy.sol:TicketNFTScript
 > ```
 
-Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` after the deployment.
+Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` with the new contract address.
 
-## 4. Start Frontend & Server
+Also, update the contract abi:
+
+```bash
+$ cp foundry/out/ticketNFT.sol/TicketNFT.json app/ticket/TicketNFT.json
+```
+## 5. Start Frontend & Server
 
 Run the development server:
 
