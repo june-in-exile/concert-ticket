@@ -28,6 +28,11 @@ export const alert_owner_msg = "You are not the owner of this ticket.";
 export const confirm_buy_msg = "Are you sure you want to buy a ticket?";
 export const confirm_cancel_msg = "Are you sure you want to cancel the ticket?";
 
+export enum Event {
+  Bought = "TicketBought",
+  Cancelled = "TicketCancelled",
+}
+
 // personal
 export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;
 export const w3a_private_key = process.env

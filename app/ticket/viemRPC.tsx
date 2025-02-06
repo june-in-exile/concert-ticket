@@ -22,6 +22,7 @@ import {
   w3a_account,
   w3a_private_key,
   chain,
+  rpcUrl,
 } from "../constant";
 
 export default class EthereumRpc {
@@ -34,7 +35,7 @@ export default class EthereumRpc {
     this.provider = provider;
     this.publicClient = createPublicClient({
       chain,
-      transport: chain === anvil ? http() : custom(provider),
+      transport: http(rpcUrl),
     });
     this.walletClient = createWalletClient({
       account:
@@ -70,29 +71,12 @@ export default class EthereumRpc {
     }
   }
 
-  async getAddresses(): Promise<any> {
-    try {
-      return chain === anvil
-        ? [w3a_account]
-        : await this.walletClient.getAddresses();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getAccounts(): Promise<any> {
-    try {
-      const addresses = await this.getAddresses();
-      return addresses;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getAccount(): Promise<any> {
     try {
-      const accounts = await this.getAccounts();
-      return accounts[0];
+      const addresses = await this.walletClient.getAddresses();
+      return chain === anvil
+        ? w3a_account
+        : addresses[0];
     } catch (error) {
       throw error;
     }
@@ -100,13 +84,10 @@ export default class EthereumRpc {
 
   async getPrivateKey(): Promise<any> {
     try {
-      if (chain === anvil) {
-        return w3a_private_key;
-      }
-      const privateKey = await this.provider.request({
-        method: "eth_private_key",
-      });
-      return privateKey;
+      return chain === anvil ? w3a_private_key :
+        await this.provider.request({
+          method: "eth_private_key",
+        });
     } catch (error) {
       throw error;
     }
@@ -114,9 +95,9 @@ export default class EthereumRpc {
 
   async getBalance(): Promise<string> {
     try {
-      const accounts = await this.getAccounts();
+      const account = await this.getAccount();
       const balance = await this.publicClient.getBalance({
-        address: accounts[0],
+        address: account,
       });
       return formatEther(balance);
     } catch (error) {
@@ -126,9 +107,9 @@ export default class EthereumRpc {
 
   async buyTicket() {
     try {
-      const accounts = await this.getAccounts();
+      const account = await this.getAccount();
       const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : accounts[0],
+        account: chain === anvil ? undefined : account,
         address: contract_address,
         abi: this.contractABI,
         functionName: "buyTicket",
@@ -147,9 +128,9 @@ export default class EthereumRpc {
 
   async cancelTicket(ticketId: number) {
     try {
-      const accounts = await this.getAccounts();
+      const account = await this.getAccount();
       const hash = await this.walletClient.writeContract({
-        account: chain === anvil ? undefined : accounts[0],
+        account: chain === anvil ? undefined : account,
         address: contract_address,
         abi: this.contractABI,
         functionName: "cancelTicket",
@@ -168,9 +149,9 @@ export default class EthereumRpc {
 
   async isMyTicket(ticketId: number) {
     try {
-      const accounts = await this.getAccounts();
+      const account = await this.getAccount();
       const isValid = await this.publicClient.readContract({
-        account: accounts[0],
+        account,
         address: contract_address,
         abi: this.contractABI,
         functionName: "isMyTicket",
@@ -185,9 +166,9 @@ export default class EthereumRpc {
 
   async getMyTickets() {
     try {
-      const accounts = await this.getAccounts();
+      const account = await this.getAccount();
       const ticketIds = await this.publicClient.readContract({
-        account: accounts[0],
+        account,
         address: contract_address,
         abi: this.contractABI,
         functionName: "getMyTickets",

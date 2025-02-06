@@ -12,6 +12,7 @@ import {
   alert_owner_msg,
   confirm_buy_msg,
   confirm_cancel_msg,
+  Event,
 } from "../constant";
 import { createPublicClient, http } from "viem";
 import RPC from "./viemRPC";
@@ -36,7 +37,7 @@ export default function Ticket() {
     return new RPC(provider);
   };
 
-  const watchEvent = (eventName) => {
+  const watchEvent = (eventName: Event) => {
     const publicClient = createPublicClient({
       chain,
       transport: chain === anvil ? http() : http(rpcUrl),
@@ -50,10 +51,21 @@ export default function Ticket() {
       onLogs: (logs) => {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-          alert(
-            `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
-          );
-          updateState()
+          switch (eventName) {
+            case Event.Bought:
+              alert(
+                `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
+              )
+              break;
+            case Event.Cancelled:
+              alert(
+                `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
+              );
+              break;
+            default:
+              console.log("Unknown Event.");
+          }
+          updateState();
           unwatch();
         }, 100);
       },
@@ -94,7 +106,7 @@ export default function Ticket() {
   const buyTicket = async () => {
     if (!confirm(confirm_buy_msg)) return;
     try {
-      watchEvent("TicketBought");
+      watchEvent(Event.Bought);
       const rpc = await checkProviderAndRPC();
       const transaction = await rpc.buyTicket();
       console.log("Transaction Mined", transaction);
@@ -158,7 +170,7 @@ export default function Ticket() {
     const ticketId = parseInt(cancelledTicket);
 
     try {
-      watchEvent("TicketCancelled");
+      watchEvent(Event.Cancelled);
       const rpc = await checkProviderAndRPC();
       const isValid = await rpc.isMyTicket(ticketId);
       if (!isValid) {
