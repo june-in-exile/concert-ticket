@@ -14,8 +14,13 @@ import {
   confirm_buy_msg,
   confirm_cancel_msg,
 } from "../constant";
-import { createWalletClient, getContract, http, publicActions } from "viem";
-import RPC from "./viemRPC";
+import {
+  createWalletClient,
+  getContract,
+  http,
+  publicActions,
+  formatEther,
+} from "viem";
 import { anvil } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import ticketNFT from "../../foundry/out/TicketNFT.sol/TicketNFT.json";
@@ -26,7 +31,9 @@ export default function Ticket() {
   const [cancelledTicket, setCancelledTicket] = useState<string>("");
   const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState<string>("");
-  const [tickets, setTickets] = useState<string[]>([]);
+  const [tickets, setTickets] = useState<bigint[]>([]);
+  const [publicClient, setPublicClient] = useState(null);
+  const [walletClient, setWalletClient] = useState(null);
   const [contract, setContract] = useState(null);
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
@@ -36,29 +43,33 @@ export default function Ticket() {
     const init = async () => {
       if (loggedIn) {
         try {
+          if (!provider) {
+            throw new Error("Provider not initialized yet");
+          }
+
           let privateKey = w3a_private_key;
           if (chain !== anvil) {
             privateKey =
               "0x" + (await provider.request({ method: "eth_private_key" }));
           }
 
-          const walletClient = createWalletClient({
+          const myWalletClient = createWalletClient({
             account: privateKeyToAccount(privateKey),
             chain,
             transport: http(rpcUrl),
           });
 
-          const publicClient = walletClient.extend(publicActions);
+          const myPublicClient = myWalletClient.extend(publicActions);
 
-          const contract = getContract({
+          const myContract = getContract({
             address: contract_address,
             abi: ticketNFT.abi,
-            client: { public: publicClient, wallet: walletClient },
+            client: { public: myPublicClient, wallet: myWalletClient },
           });
 
-          setContract(contract);
-
-          await updateState();
+          setWalletClient(myWalletClient);
+          setPublicClient(myPublicClient);
+          setContract(myContract);
         } catch (error) {
           throw error;
         }
@@ -68,6 +79,12 @@ export default function Ticket() {
     };
     init();
   }, [router, loggedIn, provider]);
+
+  useEffect(() => {
+    if (walletClient && publicClient && contract) {
+      updateState();
+    }
+  }, [walletClient, publicClient, contract]);
 
   useEffect(() => {
     if (contract && address) {
@@ -96,16 +113,23 @@ export default function Ticket() {
         },
       );
     }
-  }, [address, contract]);
+  }, [address]);
 
   const updateState = async () => {
-    if (!provider) {
-      throw new Error("Provider not initialized yet");
-    }
-    const rpc = new RPC(provider);
-    setAddress(await rpc.getAccount());
-    setBalance(await rpc.getBalance());
-    setTickets(await rpc.getMyTickets());
+    if (!walletClient) return;
+    const myAddresses = await walletClient.getAddresses();
+    const myAddress = myAddresses[0];
+    setAddress(myAddress);
+
+    if (!publicClient) return;
+    const myBalance = await publicClient.getBalance({
+      address: myAddress,
+    });
+    setBalance(formatEther(myBalance));
+
+    if (!contract) return;
+    const myTickets = await contract.read.getMyTickets();
+    setTickets(myTickets);
   };
 
   const logout = async () => {
@@ -225,7 +249,7 @@ export default function Ticket() {
         className="absolute top-20 left-0 m-6 text-foreground text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-30 sm:w-30 text-2xl"
       >
         {tickets.length
-          ? `Tickets: ${tickets.map((ticket) => ticket.padStart(4, "0")).join(", ")}`
+          ? `Tickets: ${tickets.map((ticket) => ticket.toString().padStart(4, "0")).join(", ")}`
           : `No Tickets Yet`}
       </p>
 
