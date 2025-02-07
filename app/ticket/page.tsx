@@ -13,6 +13,7 @@ import {
 } from "../constant";
 import { formatEther } from "viem";
 import { getClientsAndContract } from "./client";
+import { LoginMethod } from "../context/loginMethod";
 
 export default function Ticket() {
   const router = useRouter();
@@ -97,6 +98,7 @@ export default function Ticket() {
     if (!walletClient) return;
     const [address] = await walletClient.getAddresses();
     setAddress(address);
+    console.log("address = ", address);
 
     if (!publicClient) return;
     const balance = formatEther(await publicClient.getBalance({ address }));

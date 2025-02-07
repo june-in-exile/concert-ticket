@@ -20,6 +20,7 @@ import { anvil } from "viem/chains";
 import { IProvider } from "@web3auth/base";
 import ticketNFT from "./TicketNFT.json";
 
+// TODO: metamask for local testing
 export async function getClientsAndContract(loginMethod: Login, provider?: IProvider) {
     let publicClient, walletClient, contract;
     try {
@@ -31,10 +32,13 @@ export async function getClientsAndContract(loginMethod: Login, provider?: IProv
                 chain,
                 transport: custom(window.ethereum),
             });
-            publicClient = createPublicClient({
+            const account = await walletClient.requestAddresses();
+            walletClient = createWalletClient({
+                account,
                 chain,
                 transport: http(rpcUrl),
             });
+            publicClient = walletClient.extend(publicActions);
         } else if (loginMethod === Login.Web3Auth) {
             if (!provider) {
                 throw new Error("No Provider.");
