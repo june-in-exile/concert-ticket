@@ -1,6 +1,6 @@
 # Revolutionizing Concert Ticketing with Blockchain and NFTs
 
-## 1. Update .env
+## Prerequisite: Update .env
 
 Copy `.env.example` as `.env` and change the values to yours.
 
@@ -8,9 +8,16 @@ Copy `.env.example` as `.env` and change the values to yours.
 $ cp .env.example .env
 ```
 
-Note that in the first line of `.env` you can choose which chain you would like to use (default to "ANVIL", which is for local testing).
+Note that in the first line of `.env` you can choose which chain you would like to use (default to "ARB_SEPOLIA", while "ANVIL" is for local testing).
 
-## 2. Fork Arbitrum Sepolia
+## Run on Localhost
+
+### Environment Settings
+
+- Node v20.17.0
+- npm v10.9.0
+
+### 1. Fork Arbitrum Sepolia
 
 _(This step is required only for local testing.)_
 
@@ -19,9 +26,9 @@ $ source .env \
     && anvil --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} --chain-id 31337
 ```
 
-## 3. Build & Deploy
+### 2. Build & Deploy
 
-_(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already filled.)_
+_(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already set.)_
 
 ```bash
 $ source .env
@@ -34,11 +41,12 @@ $ cd foundry \
     && forge build
 ```
 
-> ### 3-1. Deploy on Arbitrum Sepolia
+Deploy.
+
+> ### Deploy on Arbitrum Sepolia
 >
 > ```bash
-> $ cd foundry \
->     && forge script \
+> $ forge script \
 >     --broadcast \
 >     --verify \
 >     --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
@@ -47,11 +55,10 @@ $ cd foundry \
 >     script/ticketNFT.deploy.sol:TicketNFTScript
 > ```
 >
-> ### 3-2. Deploy on Forked Arbitrum Sepolia
+> ### Deploy on Forked Arbitrum Sepolia (for local testing)
 >
 > ```bash
-> $ cd foundry \
->     && forge script \
+> $ forge script \
 >     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
 >     --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} \
 >     --broadcast \
@@ -65,7 +72,8 @@ Also, update the contract abi:
 ```bash
 $ cp foundry/out/ticketNFT.sol/TicketNFT.json app/ticket/TicketNFT.json
 ```
-## 5. Start Frontend & Server
+
+### 3. Start Frontend & Server
 
 Run the development server:
 
@@ -75,9 +83,22 @@ $ npm run dev
 
 and open [http://localhost:3000](http://localhost:3000) with your browser to see the result. After logging, fill the `NEXT_PUBLIC_W3A_ACCOUNT` field in `.env` with your Web3Auth address.
 
-## 5. Interact with the Contract on Forked Arbitrum Sepolia
+## Run in Docker
 
-_(This step is required only for local testing.)_
+Alternatively, you can run this app in docker and interact with the contarct deployed on Arbitrum Sepolia. Ensure that in `.env`:
+
+- [ ] NEXT_PUBLIC_CHAIN="ARB_SEPOLIA"
+- [ ] `NEXT_PUBLIC_CONTRACT_ADDRESS` is set.
+- [ ] `NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL` is set.
+
+Then,
+
+```bash
+$ docker build -t concert-ticket .
+$ docker run --env-file .env concert-ticket
+```
+
+## Commands to Interact with Forked Arbitrum Sepolia
 
 _(To interact with the actual Arbituem Sepolia, add `--rpc-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL}` in the end of the command.)_
 

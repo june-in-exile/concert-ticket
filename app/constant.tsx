@@ -36,4 +36,4 @@ export const pimlico_api_key = "pim_6uN1PB3Q8fGTd86Xskgthf"; // get from dashboa
 export const w3a_clientId =
   "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from dashboard.web3auth.io
 export const google_clientId =
-  "63140164655-5fsi5uk3ufolbtufe9ovofm2uf5mho39.apps.googleusercontent.com";
+  "63140164655-5fsi5uk3ufolbtufe9ovofm2uf5mho39.apps.googleusercontent.com"; // get from console.cloud.google.com/apis/dashboard
