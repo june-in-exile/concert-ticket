@@ -25,8 +25,6 @@ export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 
 export const alert_ticketId_msg = "Ticket ID is a nonzero 4-digit number.";
 export const alert_owner_msg = "You are not the owner of this ticket.";
-export const alert_no_metamask_msg =
-  "MetaMask wallet is not installed. Please install one to proceed.";
 export const alert_logout_metamask_msg =
   "Please disconnect from Metamask manually.";
 export const confirm_buy_msg = "Are you sure you want to buy a ticket?";

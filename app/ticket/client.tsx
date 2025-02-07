@@ -14,7 +14,6 @@ import {
     w3a_private_key,
     contract_address,
     Login,
-    alert_no_metamask_msg,
 } from "../constant";
 import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
@@ -29,9 +28,6 @@ export async function getClientsAndContract(
     let publicClient, walletClient, contract;
     try {
         if (loginMethod === Login.Metamask) {
-            if (!provider) {
-                throw new Error(alert_no_metamask_msg);
-            }
             if (chain == anvil) {
                 walletClient = createWalletClient({
                     account: privateKeyToAccount(metamask_private_key),
@@ -39,21 +35,14 @@ export async function getClientsAndContract(
                     transport: http(rpcUrl),
                 });
             } else {
-                // walletClient = createWalletClient({
-                //     chain,
-                //     transport: custom(window.ethereum),
-                // });
-                // const [account] = await walletClient.requestAddresses();
-                // console.log("account = ", account);
+                const [account] = await window.ethereum!.request({ method: 'eth_requestAccounts' });
                 walletClient = createWalletClient({
+                    account,
                     chain,
                     transport: custom(provider),
                 });
             }
         } else if (loginMethod === Login.Web3Auth) {
-            if (!provider) {
-                throw new Error("No Provider.");
-            }
             let privateKey = w3a_private_key;
             if (chain !== anvil) {
                 privateKey =

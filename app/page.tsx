@@ -27,7 +27,6 @@ import {
   formatEther,
 } from "viem";
 
-
 export default function Home() {
   const router = useRouter();
   const { setProvider } = useProvider();

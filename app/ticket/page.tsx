@@ -24,7 +24,6 @@ import {
   formatEther,
 } from "viem";
 
-
 export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState<string>("");
@@ -41,33 +40,16 @@ export default function Ticket() {
 
   useEffect(() => {
     const init = async () => {
-      console.log("loginMethod = ", loginMethod);
       try {
         if (!loginMethod) {
           router.push(`/`);
-        }
-        else if (loginMethod === Login.Metamask) {
-          const { publicClient: _publicClient, walletClient: _walletClient, contract } =
-            await getClientsAndContract(loginMethod, provider);
-          setPublicClient(_publicClient);
-          setWalletClient(_walletClient);
-          setContract(contract);
-          const [address] = await _walletClient.requestAddresses();
-
-          const balance = formatEther(await _publicClient.getBalance({ address }));
-
-          console.log("address =", address);
-          console.log("balance =", balance);
-        } else if (loginMethod === Login.Web3Auth) {
-          if (!provider) {
-            throw new Error("Provider not initialized yet");
-          }
-          const { publicClient, walletClient, contract } =
-            await getClientsAndContract(loginMethod, provider);
-          setPublicClient(publicClient);
-          setWalletClient(walletClient);
-          setContract(contract);
-        }
+          return;
+        } 
+        const { publicClient, walletClient, contract } =
+          await getClientsAndContract(loginMethod, provider);
+        setPublicClient(publicClient);
+        setWalletClient(walletClient);
+        setContract(contract);
       } catch (error) {
         throw error;
       }
@@ -119,9 +101,9 @@ export default function Ticket() {
     const balance = formatEther(await publicClient.getBalance({ address }));
     setBalance(balance);
 
-    // if (!contract) return;
-    // const myTickets = await contract.read.getMyTickets();
-    // setTickets(myTickets);
+    if (!contract) return;
+    const myTickets = await contract.read.getMyTickets();
+    setTickets(myTickets);
   };
 
   const logout = async () => {
