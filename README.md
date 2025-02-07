@@ -82,7 +82,7 @@ $ npm install
 $ npm run dev
 ```
 
-and open [http://localhost:3000](http://localhost:3000) with your browser to see the result. After logging, fill the `NEXT_PUBLIC_W3A_ACCOUNT` field in `.env` with your Web3Auth address.
+and open [http://localhost:3000](http://localhost:3000) with your browser to see the result. After logging, fill the `NEXT_PUBLIC_ANVIL_ACCOUNT` field in `.env` with your Web3Auth address.
 
 ## Run in Docker
 
@@ -110,43 +110,43 @@ $ source .env
 Send 1 ETH from Alice (a simulated account in Anvil) to your Web3Auth account:
 
 ```bash
-$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_W3A_ACCOUNT} --value 1ether
+$ cast send --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} ${NEXT_PUBLIC_ANVIL_ACCOUNT} --value 1ether
 ```
 
 Check your ETH balance:
 
 ```bash
-$ cast balance ${NEXT_PUBLIC_W3A_ACCOUNT}
+$ cast balance ${NEXT_PUBLIC_ANVIL_ACCOUNT}
 ```
 
 Buy ticket
 
 ```bash
-$ cast send --from ${NEXT_PUBLIC_W3A_ACCOUNT} --private-key ${NEXT_PUBLIC_W3A_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "buyTicket()"
+$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "buyTicket()"
 ```
 
 Validate the ticket
 
 ```bash
-$ cast call --from ${NEXT_PUBLIC_W3A_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "isMyTicket(uint256)(bool)" <tokenId>
+$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "isMyTicket(uint256)(bool)" <tokenId>
 ```
 
 Cancel the ticket
 
 ```bash
-$ cast send --from ${NEXT_PUBLIC_W3A_ACCOUNT} --private-key ${NEXT_PUBLIC_W3A_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "cancelTicket(uint256)" <tokenId>
+$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "cancelTicket(uint256)" <tokenId>
 ```
 
 Get your tickets
 
 ```bash
-$ cast call --from ${NEXT_PUBLIC_W3A_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "getMyTickets()(uint256[])"
+$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "getMyTickets()(uint256[])"
 ```
 
 Check your number of tickets
 
 ```bash
-$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_W3A_ACCOUNT}
+$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_ANVIL_ACCOUNT}
 ```
 
 Check the owner of a ticket:

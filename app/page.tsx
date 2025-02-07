@@ -99,7 +99,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    console.log("loginMethod = ", loginMethod);
     if (loginMethod) {
       router.push("/ticket");
     }
@@ -116,8 +115,7 @@ export default function Home() {
 
   const loginWithW3A = async () => {
     if (!web3Auth) {
-      console.log("web3Auth not initialized yet");
-      return;
+      throw new Error("web3Auth not initialized yet");
     }
     await web3Auth.connectTo(WALLET_ADAPTERS.AUTH, {
       loginProvider: "google",

@@ -34,6 +34,12 @@ export default function Ticket() {
   const [publicClient, setPublicClient] = useState(null);
   const [walletClient, setWalletClient] = useState(null);
   const [contract, setContract] = useState(null);
+  const [unwatchTicketBought, setUnwatchTicketBought] = useState(
+    () => () => {},
+  );
+  const [unwatchTicketCancelled, setUnwatchTicketCancelled] = useState(
+    () => () => {},
+  );
   const { web3Auth } = useWeb3Auth();
   const { provider, setProvider } = useProvider();
   const { loginMethod, setLoginMethod } = useLoginMethod();
@@ -42,9 +48,11 @@ export default function Ticket() {
     const init = async () => {
       try {
         if (!loginMethod) {
+          unwatchTicketBought();
+          unwatchTicketCancelled();
           router.push(`/`);
           return;
-        } 
+        }
         const { publicClient, walletClient, contract } =
           await getClientsAndContract(loginMethod, provider);
         setPublicClient(publicClient);
@@ -58,52 +66,55 @@ export default function Ticket() {
   }, [router, loginMethod, provider]);
 
   useEffect(() => {
-    if (walletClient && publicClient && contract) {
-      updateState();
-    }
-  }, [walletClient, publicClient, contract]);
+    updateState();
+  }, [contract]);
 
+  // Fix: cannot receive the event if login with metamask
   useEffect(() => {
-    if (contract && address) {
-      contract.watchEvent.TicketBought(
-        {
-          from: address,
+    if (!contract || !address) return;
+    const unwatchTicketBought = contract.watchEvent.TicketBought(
+      {
+        from: address,
+      },
+      {
+        onLogs: (logs) => {
+          alert(
+            `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
+          );
+          updateState();
         },
-        {
-          onLogs: (logs) => {
-            alert(
-              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} bought.`,
-            );
-          },
+      },
+    );
+    const unwatchTicketCancelled = contract.watchEvent.TicketCancelled(
+      {
+        from: address,
+      },
+      {
+        onLogs: (logs) => {
+          alert(
+            `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
+          );
+          updateState();
         },
-      );
-      contract.watchEvent.TicketCancelled(
-        {
-          from: address,
-        },
-        {
-          onLogs: (logs) => {
-            alert(
-              `Ticket ${logs[0].args.tokenId.toString().padStart(4, "0")} cancelled.`,
-            );
-          },
-        },
-      );
-    }
+      },
+    );
+    setUnwatchTicketBought(() => unwatchTicketBought);
+    setUnwatchTicketCancelled(() => unwatchTicketCancelled);
   }, [address]);
 
   const updateState = async () => {
-    if (!walletClient) return;
+    if (!contract) {
+      throw new Error("Contract not initialized yet.");
+    }
+
     const [address] = await walletClient.getAddresses();
     setAddress(address);
 
-    if (!publicClient) return;
     const balance = formatEther(await publicClient.getBalance({ address }));
     setBalance(balance);
 
-    if (!contract) return;
-    const myTickets = await contract.read.getMyTickets();
-    setTickets(myTickets);
+    const tickets = await contract.read.getMyTickets();
+    setTickets(tickets);
   };
 
   const logout = async () => {
@@ -113,7 +124,6 @@ export default function Ticket() {
       if (!web3Auth) {
         throw new Error("web3auth not initialized yet");
       }
-      console.log("web3Auth = ", web3Auth);
       await web3Auth.logout();
     }
     setLoginMethod(null);
@@ -127,8 +137,6 @@ export default function Ticket() {
       console.log("Transaction of buyTicket:", transaction);
     } catch (error) {
       throw error;
-    } finally {
-      updateState();
     }
   };
 
@@ -194,8 +202,6 @@ export default function Ticket() {
       console.log("Transaction of cancelTicket:", transaction);
     } catch (error) {
       throw error;
-    } finally {
-      updateState();
     }
   };
 
