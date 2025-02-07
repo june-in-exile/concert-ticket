@@ -25,13 +25,14 @@ export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 
 export const alert_ticketId_msg = "Ticket ID is a nonzero 4-digit number.";
 export const alert_owner_msg = "You are not the owner of this ticket.";
-export const alert_metamask_msg =
+export const alert_no_metamask_msg =
   "MetaMask wallet is not installed. Please install one to proceed.";
+export const alert_logout_metamask_msg =
+  "Please disconnect from Metamask manually.";
 export const confirm_buy_msg = "Are you sure you want to buy a ticket?";
 export const confirm_cancel_msg = "Are you sure you want to cancel the ticket?";
 
 export enum Login {
-  None = 0,
   Metamask = 1,
   Web3Auth = 2,
 }
@@ -40,6 +41,8 @@ export enum Login {
 export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;
 export const w3a_private_key = process.env
   .NEXT_PUBLIC_W3A_PRIVATE_KEY as `0x${string}`;
+export const metamask_private_key = process.env
+  .NEXT_PUBLIC_METAMASK_PRIVATE_KEY as `0x${string}`;
 export const pimlico_api_key = "pim_6uN1PB3Q8fGTd86Xskgthf"; // get from dashboard.pimlico.io/
 export const w3a_clientId =
   "BFGwdPvLq1EkTdOQMA5YUscOiycV56JuacnskVNN5S57ZgS1Td78R5oUIYXjvlE640taCcitQRxpM9RXzpBikuA"; // get from dashboard.web3auth.io

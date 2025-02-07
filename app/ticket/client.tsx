@@ -10,10 +10,11 @@ import "viem/window";
 import {
     chain,
     rpcUrl,
+    metamask_private_key,
     w3a_private_key,
     contract_address,
     Login,
-    alert_metamask_msg,
+    alert_no_metamask_msg,
 } from "../constant";
 import { privateKeyToAccount } from "viem/accounts";
 import { anvil } from "viem/chains";
@@ -21,24 +22,34 @@ import { IProvider } from "@web3auth/base";
 import ticketNFT from "./TicketNFT.json";
 
 // TODO: metamask for local testing
-export async function getClientsAndContract(loginMethod: Login, provider?: IProvider) {
+export async function getClientsAndContract(
+    loginMethod: Login,
+    provider: IProvider,
+) {
     let publicClient, walletClient, contract;
     try {
         if (loginMethod === Login.Metamask) {
-            if (!window.ethereum) {
-                throw new Error(alert_metamask_msg);
+            if (!provider) {
+                throw new Error(alert_no_metamask_msg);
             }
-            walletClient = createWalletClient({
-                chain,
-                transport: custom(window.ethereum),
-            });
-            const account = await walletClient.requestAddresses();
-            walletClient = createWalletClient({
-                account,
-                chain,
-                transport: http(rpcUrl),
-            });
-            publicClient = walletClient.extend(publicActions);
+            if (chain == anvil) {
+                walletClient = createWalletClient({
+                    account: privateKeyToAccount(metamask_private_key),
+                    chain,
+                    transport: http(rpcUrl),
+                });
+            } else {
+                // walletClient = createWalletClient({
+                //     chain,
+                //     transport: custom(window.ethereum),
+                // });
+                // const [account] = await walletClient.requestAddresses();
+                // console.log("account = ", account);
+                walletClient = createWalletClient({
+                    chain,
+                    transport: custom(provider),
+                });
+            }
         } else if (loginMethod === Login.Web3Auth) {
             if (!provider) {
                 throw new Error("No Provider.");
@@ -53,10 +64,10 @@ export async function getClientsAndContract(loginMethod: Login, provider?: IProv
                 chain,
                 transport: http(rpcUrl),
             });
-            publicClient = walletClient.extend(publicActions);
         } else {
             throw new Error("Not login yet.");
-        };
+        }
+        publicClient = walletClient.extend(publicActions);
         contract = getContract({
             address: contract_address,
             abi: ticketNFT.abi,

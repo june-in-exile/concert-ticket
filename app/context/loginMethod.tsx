@@ -10,7 +10,7 @@ export const LoginMethod = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const [loginMethod, setLoginMethod] = useState<Login>(Login.None);
+  const [loginMethod, setLoginMethod] = useState<Login>();
   return (
     <LoginMethodContext.Provider value={{ loginMethod, setLoginMethod }}>
       {children}

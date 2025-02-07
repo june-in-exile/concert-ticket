@@ -11,7 +11,22 @@ import {
 } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
-import { Login, w3a_clientId, google_clientId } from "./constant";
+import {
+  chain,
+  rpcUrl,
+  StorageKey,
+  Login,
+  w3a_clientId,
+  google_clientId,
+} from "./constant";
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  http,
+  formatEther,
+} from "viem";
+
 
 export default function Home() {
   const router = useRouter();
@@ -75,7 +90,6 @@ export default function Home() {
 
         if (web3AuthInstance.connected) {
           setLoginMethod(Login.Web3Auth);
-          console.log("web3AuthInstance connected!");
         }
       } catch (error) {
         console.error(error);
@@ -86,7 +100,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (loginMethod !== Login.None) {
+    console.log("loginMethod = ", loginMethod);
+    if (loginMethod) {
       router.push("/ticket");
     }
   }, [router, loginMethod]);
@@ -96,6 +111,7 @@ export default function Home() {
       alert("Please install MetaMask!");
       return;
     }
+    setProvider(window.ethereum!);
     setLoginMethod(Login.Metamask);
   };
 
@@ -104,10 +120,9 @@ export default function Home() {
       console.log("web3Auth not initialized yet");
       return;
     }
-    const web3AuthProvider = await web3Auth.connectTo(WALLET_ADAPTERS.AUTH, {
+    await web3Auth.connectTo(WALLET_ADAPTERS.AUTH, {
       loginProvider: "google",
     });
-    setProvider(web3AuthProvider);
   };
 
   return (

@@ -4,16 +4,26 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3Auth, useProvider, useLoginMethod } from "../context";
 import {
+  chain,
+  rpcUrl,
   ticketId_pattern,
   alert_ticketId_msg,
   alert_owner_msg,
+  alert_logout_metamask_msg,
   confirm_buy_msg,
   confirm_cancel_msg,
   Login,
+  StorageKey,
 } from "../constant";
-import { formatEther } from "viem";
 import { getClientsAndContract } from "./client";
-import { LoginMethod } from "../context/loginMethod";
+import {
+  createWalletClient,
+  createPublicClient,
+  custom,
+  http,
+  formatEther,
+} from "viem";
+
 
 export default function Ticket() {
   const router = useRouter();
@@ -25,23 +35,29 @@ export default function Ticket() {
   const [publicClient, setPublicClient] = useState(null);
   const [walletClient, setWalletClient] = useState(null);
   const [contract, setContract] = useState(null);
-  const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
+  const { provider, setProvider } = useProvider();
   const { loginMethod, setLoginMethod } = useLoginMethod();
 
   useEffect(() => {
     const init = async () => {
-      if (loginMethod === Login.None) {
-        router.push(`/`);
-        return;
-      }
+      console.log("loginMethod = ", loginMethod);
       try {
-        if (loginMethod === Login.Metamask) {
-          const { publicClient, walletClient, contract } =
-            await getClientsAndContract(loginMethod);
-          setPublicClient(publicClient);
-          setWalletClient(walletClient);
+        if (!loginMethod) {
+          router.push(`/`);
+        }
+        else if (loginMethod === Login.Metamask) {
+          const { publicClient: _publicClient, walletClient: _walletClient, contract } =
+            await getClientsAndContract(loginMethod, provider);
+          setPublicClient(_publicClient);
+          setWalletClient(_walletClient);
           setContract(contract);
+          const [address] = await _walletClient.requestAddresses();
+
+          const balance = formatEther(await _publicClient.getBalance({ address }));
+
+          console.log("address =", address);
+          console.log("balance =", balance);
         } else if (loginMethod === Login.Web3Auth) {
           if (!provider) {
             throw new Error("Provider not initialized yet");
@@ -98,27 +114,27 @@ export default function Ticket() {
     if (!walletClient) return;
     const [address] = await walletClient.getAddresses();
     setAddress(address);
-    console.log("address = ", address);
 
     if (!publicClient) return;
     const balance = formatEther(await publicClient.getBalance({ address }));
     setBalance(balance);
 
-    if (!contract) return;
-    const myTickets = await contract.read.getMyTickets();
-    setTickets(myTickets);
+    // if (!contract) return;
+    // const myTickets = await contract.read.getMyTickets();
+    // setTickets(myTickets);
   };
 
   const logout = async () => {
-    if (loginMethod === Login.None) {
-    } else if (loginMethod === Login.Metamask) {
+    if (loginMethod === Login.Metamask) {
+      alert(alert_logout_metamask_msg);
     } else if (loginMethod === Login.Web3Auth) {
       if (!web3Auth) {
         throw new Error("web3auth not initialized yet");
       }
+      console.log("web3Auth = ", web3Auth);
       await web3Auth.logout();
     }
-    setLoginMethod(Login.None);
+    setLoginMethod(null);
     setProvider(null);
   };
 
