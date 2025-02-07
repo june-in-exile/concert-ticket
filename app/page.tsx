@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useProvider, useWeb3Auth, useLoggedIn } from "./context";
+import { useProvider, useWeb3Auth, useLoginMethod } from "./context";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import {
   WALLET_ADAPTERS,
@@ -10,28 +10,14 @@ import {
   UX_MODE,
 } from "@web3auth/base";
 import { AuthAdapter } from "@web3auth/auth-adapter";
-// import {
-//   AccountAbstractionProvider,
-//   SafeSmartAccount,
-// } from "@web3auth/account-abstraction-provider";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
-// import { createWalletClient, custom } from "viem";
-import {
-  chain,
-  rpcUrl,
-  arb_sepolia_chainId,
-  // pimlico_api_key,
-  w3a_clientId,
-  google_clientId,
-} from "./constant";
-// import RPC from "./ticket/viemRPC"; // for using viem
-import { arbitrumSepolia } from "viem/chains";
+import { Login, w3a_clientId, google_clientId } from "./constant";
 
 export default function Home() {
   const router = useRouter();
-  const { provider, setProvider } = useProvider();
+  const { setProvider } = useProvider();
   const { web3Auth, setWeb3Auth } = useWeb3Auth();
-  const { loggedIn, setLoggedIn } = useLoggedIn();
+  const { loginMethod, setLoginMethod } = useLoginMethod();
 
   useEffect(() => {
     const init = async () => {
@@ -47,19 +33,6 @@ export default function Home() {
           logo: "https://cryptologos.cc/logos/arbitrum-arb-logo.png",
         };
 
-        // const accountAbstractionProvider = new AccountAbstractionProvider({
-        //   config: {
-        //     chainConfig,
-        //     bundlerConfig: {
-        //       url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-        //     },
-        //     smartAccountInit: new SafeSmartAccount(),
-        //     paymasterConfig: {
-        //       url: `https://api.pimlico.io/v2/${arb_sepolia_chainId}/rpc?apikey=${pimlico_api_key}`,
-        //     },
-        //   },
-        // });
-
         const privateKeyProvider = new EthereumPrivateKeyProvider({
           config: { chainConfig },
         });
@@ -68,7 +41,6 @@ export default function Home() {
           clientId: w3a_clientId,
           web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           privateKeyProvider,
-          // accountAbstractionProvider
         });
 
         const authAdapter = new AuthAdapter({
@@ -102,7 +74,7 @@ export default function Home() {
         setProvider(web3AuthInstance.provider);
 
         if (web3AuthInstance.connected) {
-          setLoggedIn(true);
+          setLoginMethod(Login.Web3Auth);
           console.log("web3AuthInstance connected!");
         }
       } catch (error) {
@@ -114,12 +86,20 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (loggedIn) {
+    if (loginMethod !== Login.None) {
       router.push("/ticket");
     }
-  }, [router, loggedIn]);
+  }, [router, loginMethod]);
 
-  const loginWithGoogle = async () => {
+  const loginWithMetamask = async () => {
+    if (!window.ethereum) {
+      alert("Please install MetaMask!");
+      return;
+    }
+    setLoginMethod(Login.Metamask);
+  };
+
+  const loginWithW3A = async () => {
     if (!web3Auth) {
       console.log("web3Auth not initialized yet");
       return;
@@ -130,20 +110,21 @@ export default function Home() {
     setProvider(web3AuthProvider);
   };
 
-  const loginButton = (
-    <button
-      className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-6 sm:h-6 sm:min-px-5 w-20 sm:w-20 group absolute top-0 right-0 m-6 text-2xl"
-      aria-label="Login"
-      onClick={loginWithGoogle}
-    >
-      Login
-    </button>
-  );
-
   return (
     <>
       <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
-        {loginButton}
+        <button
+          className="px-8 py-2 rounded-md bg-[#1e2124] flex flex-row items-center justify-center border border-[#1e2124] hover:border hover:border-[#f4915d] shadow-md shadow-indigo-500/10"
+          onClick={loginWithMetamask}
+        >
+          <h1 className="mx-auto">Metamask Login</h1>
+        </button>
+        <button
+          className="px-8 py-2 rounded-md bg-[#1e2124] flex flex-row items-center justify-center border border-[#1e2124] hover:border hover:border-[#496ef4] shadow-md shadow-indigo-500/10"
+          onClick={loginWithW3A}
+        >
+          <h1 className="mx-auto">Web3Auth Login</h1>
+        </button>
       </div>
     </>
   );

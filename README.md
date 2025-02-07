@@ -78,6 +78,7 @@ $ cp foundry/out/ticketNFT.sol/TicketNFT.json app/ticket/TicketNFT.json
 Run the development server:
 
 ```bash
+$ npm install
 $ npm run dev
 ```
 

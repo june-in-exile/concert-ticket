@@ -2,28 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useWeb3Auth, useProvider, useLoggedIn } from "../context";
+import { useWeb3Auth, useProvider, useLoginMethod } from "../context";
 import {
-  chain,
-  rpcUrl,
-  w3a_private_key,
-  contract_address,
   ticketId_pattern,
   alert_ticketId_msg,
   alert_owner_msg,
   confirm_buy_msg,
   confirm_cancel_msg,
+  Login,
 } from "../constant";
-import {
-  createWalletClient,
-  getContract,
-  http,
-  publicActions,
-  formatEther,
-} from "viem";
-import { anvil } from "viem/chains";
-import { privateKeyToAccount } from "viem/accounts";
-import ticketNFT from "./TicketNFT.json";
+import { formatEther } from "viem";
+import { getClientsAndContract } from "./client";
 
 export default function Ticket() {
   const router = useRouter();
@@ -37,48 +26,37 @@ export default function Ticket() {
   const [contract, setContract] = useState(null);
   const { provider, setProvider } = useProvider();
   const { web3Auth } = useWeb3Auth();
-  const { loggedIn, setLoggedIn } = useLoggedIn();
+  const { loginMethod, setLoginMethod } = useLoginMethod();
 
   useEffect(() => {
     const init = async () => {
-      if (loggedIn) {
-        try {
+      if (loginMethod === Login.None) {
+        router.push(`/`);
+        return;
+      }
+      try {
+        if (loginMethod === Login.Metamask) {
+          const { publicClient, walletClient, contract } =
+            await getClientsAndContract(loginMethod);
+          setPublicClient(publicClient);
+          setWalletClient(walletClient);
+          setContract(contract);
+        } else if (loginMethod === Login.Web3Auth) {
           if (!provider) {
             throw new Error("Provider not initialized yet");
           }
-
-          let privateKey = w3a_private_key;
-          if (chain !== anvil) {
-            privateKey =
-              "0x" + (await provider.request({ method: "eth_private_key" }));
-          }
-
-          const myWalletClient = createWalletClient({
-            account: privateKeyToAccount(privateKey),
-            chain,
-            transport: http(rpcUrl),
-          });
-
-          const myPublicClient = myWalletClient.extend(publicActions);
-
-          const myContract = getContract({
-            address: contract_address,
-            abi: ticketNFT.abi,
-            client: { public: myPublicClient, wallet: myWalletClient },
-          });
-
-          setWalletClient(myWalletClient);
-          setPublicClient(myPublicClient);
-          setContract(myContract);
-        } catch (error) {
-          throw error;
+          const { publicClient, walletClient, contract } =
+            await getClientsAndContract(loginMethod, provider);
+          setPublicClient(publicClient);
+          setWalletClient(walletClient);
+          setContract(contract);
         }
-      } else {
-        router.push(`/`);
+      } catch (error) {
+        throw error;
       }
     };
     init();
-  }, [router, loggedIn, provider]);
+  }, [router, loginMethod, provider]);
 
   useEffect(() => {
     if (walletClient && publicClient && contract) {
@@ -117,15 +95,12 @@ export default function Ticket() {
 
   const updateState = async () => {
     if (!walletClient) return;
-    const myAddresses = await walletClient.getAddresses();
-    const myAddress = myAddresses[0];
-    setAddress(myAddress);
+    const [address] = await walletClient.getAddresses();
+    setAddress(address);
 
     if (!publicClient) return;
-    const myBalance = await publicClient.getBalance({
-      address: myAddress,
-    });
-    setBalance(formatEther(myBalance));
+    const balance = formatEther(await publicClient.getBalance({ address }));
+    setBalance(balance);
 
     if (!contract) return;
     const myTickets = await contract.read.getMyTickets();
@@ -133,11 +108,15 @@ export default function Ticket() {
   };
 
   const logout = async () => {
-    if (!web3Auth) {
-      throw new Error("web3auth not initialized yet");
+    if (loginMethod === Login.None) {
+    } else if (loginMethod === Login.Metamask) {
+    } else if (loginMethod === Login.Web3Auth) {
+      if (!web3Auth) {
+        throw new Error("web3auth not initialized yet");
+      }
+      await web3Auth.logout();
     }
-    await web3Auth.logout();
-    setLoggedIn(false);
+    setLoginMethod(Login.None);
     setProvider(null);
   };
 

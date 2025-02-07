@@ -25,8 +25,16 @@ export const address_pattern = /^0x[a-fA-F0-9]{40}$/;
 
 export const alert_ticketId_msg = "Ticket ID is a nonzero 4-digit number.";
 export const alert_owner_msg = "You are not the owner of this ticket.";
+export const alert_metamask_msg =
+  "MetaMask wallet is not installed. Please install one to proceed.";
 export const confirm_buy_msg = "Are you sure you want to buy a ticket?";
 export const confirm_cancel_msg = "Are you sure you want to cancel the ticket?";
+
+export enum Login {
+  None = 0,
+  Metamask = 1,
+  Web3Auth = 2,
+}
 
 // personal
 export const w3a_account = process.env.NEXT_PUBLIC_W3A_ACCOUNT as `0x${string}`;
