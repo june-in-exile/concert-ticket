@@ -1,7 +1,7 @@
 "use client";
 import { anvil, arbitrumSepolia } from "viem/chains";
 
-const envChain = process.env.NEXT_PUBLIC_CHAIN as "ARB_SEPOLIA" | "ANVIL";
+export const envChain = process.env.NEXT_PUBLIC_CHAIN as "ARB_SEPOLIA" | "ANVIL";
 
 let chain;
 let rpcUrl: string;

@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWeb3Auth, useProvider, useLoginMethod } from "../context";
 import {
-  chain,
-  rpcUrl,
   ticketId_pattern,
   alert_ticketId_msg,
   alert_owner_msg,
@@ -13,21 +11,15 @@ import {
   confirm_buy_msg,
   confirm_cancel_msg,
   Login,
-  StorageKey,
 } from "../constant";
 import { getClientsAndContract } from "./client";
-import {
-  createWalletClient,
-  createPublicClient,
-  custom,
-  http,
-  formatEther,
-} from "viem";
+import {formatEther} from "viem";
 
 export default function Ticket() {
   const router = useRouter();
   const [validatedTicket, setValidatedTicket] = useState<string>("");
   const [cancelledTicket, setCancelledTicket] = useState<string>("");
+  const [transaction, setTransaction] = useState<string>("");
   const [address, setAddress] = useState<`0x${string}`>("0x");
   const [balance, setBalance] = useState<string>("");
   const [tickets, setTickets] = useState<bigint[]>([]);
@@ -68,6 +60,11 @@ export default function Ticket() {
   useEffect(() => {
     updateState();
   }, [contract]);
+
+  useEffect(() => {
+    console.log("Transaction Mined: %s", transaction);
+    updateState();
+  }, [transaction]);
 
   // Fix: cannot receive the event if login with metamask
   useEffect(() => {
@@ -134,7 +131,7 @@ export default function Ticket() {
     if (!confirm(confirm_buy_msg)) return;
     try {
       const transaction = await contract.write.buyTicket();
-      console.log("Transaction of buyTicket:", transaction);
+      setTransaction(transaction);
     } catch (error) {
       throw error;
     }
@@ -199,7 +196,7 @@ export default function Ticket() {
         return;
       }
       const transaction = await contract.write.cancelTicket([ticketId]);
-      console.log("Transaction of cancelTicket:", transaction);
+      setTransaction(transaction);
     } catch (error) {
       throw error;
     }

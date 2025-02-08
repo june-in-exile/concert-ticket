@@ -12,20 +12,10 @@ import {
 import { AuthAdapter } from "@web3auth/auth-adapter";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import {
-  chain,
-  rpcUrl,
-  StorageKey,
   Login,
   w3a_clientId,
   google_clientId,
 } from "./constant";
-import {
-  createWalletClient,
-  createPublicClient,
-  custom,
-  http,
-  formatEther,
-} from "viem";
 
 export default function Home() {
   const router = useRouter();

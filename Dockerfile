@@ -1,8 +1,8 @@
 FROM node:20-alpine
 
-COPY . .
-
 WORKDIR /concert-ticket
+
+COPY . /concert-ticket
 
 RUN npm install && npm cache clean --force
 

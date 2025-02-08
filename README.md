@@ -96,7 +96,7 @@ Then,
 
 ```bash
 $ docker build -t concert-ticket .
-$ docker run --env-file .env concert-ticket
+$ docker run -p 3000:3000 concert-ticket
 ```
 
 ## Commands to Interact with Forked Arbitrum Sepolia
