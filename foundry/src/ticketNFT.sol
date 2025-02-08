@@ -2,13 +2,14 @@
 pragma solidity ^0.8.21;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./IERC5192.sol";
 
 // Refs of  SBT
 // https://learnblockchain.cn/article/6667
 // https://github.com/nodejs/docker-node/blob/a35f40787c5c4744ad52af7ba0f55034a7fa3481/20/alpine3.21/Dockerfile
 // https://github.com/attestate/ERC5192/blob/main/src/ERC5192.sol
 
-contract TicketNFT is ERC721 {
+contract TicketNFT is ERC721, IERC5192 {
     uint256 private _nextTokenId;
 
     event TicketBought(address indexed from, uint256 tokenId);
@@ -48,5 +49,10 @@ contract TicketNFT is ERC721 {
             }
         }
         return ownedTickets;
+    }
+
+    function locked(uint256 tokenId) external view returns (bool) {
+        if (!_exists(tokenId)) revert ErrNotFound();
+        return isLocked;
     }
 }
