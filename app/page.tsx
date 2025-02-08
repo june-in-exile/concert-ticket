@@ -126,13 +126,13 @@ export default function Home() {
     <>
       <div className="flex gap-4 items-center justify-center flex-col sm:flex-row">
         <button
-          className="px-8 py-2 rounded-md bg-[#1e2124] flex flex-row items-center justify-center border border-[#1e2124] hover:border hover:border-[#f4915d] shadow-md shadow-indigo-500/10"
+          className="px-8 py-2 rounded-md bg-background flex flex-row items-center justify-center border border-foreground hover:border hover:border-[#f4915d] shadow-md shadow-indigo-500/10"
           onClick={loginWithMetamask}
         >
           <h1 className="mx-auto">Metamask Login</h1>
         </button>
         <button
-          className="px-8 py-2 rounded-md bg-[#1e2124] flex flex-row items-center justify-center border border-[#1e2124] hover:border hover:border-[#496ef4] shadow-md shadow-indigo-500/10"
+          className="px-8 py-2 rounded-md bg-background flex flex-row items-center justify-center border border-foreground hover:border hover:border-[#496ef4] shadow-md shadow-indigo-500/10"
           onClick={loginWithW3A}
         >
           <h1 className="mx-auto">Web3Auth Login</h1>
