@@ -18,20 +18,10 @@ contract TicketNFTTest is Test {
     function testValidateTicketsNotExist() public {
         vm.startPrank(alice);
         assertFalse(ticketNFT.isMyTicket(0));
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721NonexistentToken.selector,
-                0
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
         ticketNFT.ownerOf(0);
         assertFalse(ticketNFT.isMyTicket(1));
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721NonexistentToken.selector,
-                1
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
         ticketNFT.ownerOf(1);
         vm.stopPrank();
     }
@@ -41,12 +31,7 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket();
         assertFalse(ticketNFT.isMyTicket(0));
         assertTrue(ticketNFT.isMyTicket(1));
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721NonexistentToken.selector,
-                0
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
         ticketNFT.ownerOf(0);
         assertEq(ticketNFT.ownerOf(1), alice);
         vm.stopPrank();
@@ -163,23 +148,11 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket();
 
         vm.prank(cara);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                cara,
-                1
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, cara, 1));
         ticketNFT.transferFrom(alice, bob, 1);
 
         vm.prank(cara);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                cara,
-                2
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, cara, 2));
         ticketNFT.transferFrom(alice, bob, 2);
 
         vm.prank(alice);
@@ -195,13 +168,7 @@ contract TicketNFTTest is Test {
         assertTrue(ticketNFT.isMyTicket(1));
 
         vm.prank(cara);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                cara,
-                2
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, cara, 2));
         ticketNFT.transferFrom(alice, bob, 2);
     }
 
@@ -213,23 +180,11 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket();
 
         vm.prank(cara);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                cara,
-                1
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, cara, 1));
         ticketNFT.transferFrom(alice, bob, 1);
 
         vm.prank(cara);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                cara,
-                2
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, cara, 2));
         ticketNFT.transferFrom(alice, bob, 2);
 
         vm.prank(alice);
@@ -243,7 +198,7 @@ contract TicketNFTTest is Test {
 
         vm.prank(alice);
         assertFalse(ticketNFT.isMyTicket(1));
-        
+
         vm.prank(alice);
         assertFalse(ticketNFT.isMyTicket(2));
 

@@ -9,6 +9,7 @@ contract TicketSBTTest is Test {
     TicketSBT public ticketSBT;
     address public alice = address(0x1);
     address public bob = address(0x2);
+    address public cara = address(0x3);
 
     function setUp() external {
         ticketSBT = new TicketSBT();
@@ -109,5 +110,56 @@ contract TicketSBTTest is Test {
         assertEq(ticketSBT.getMyTickets(), aliceTickets);
         vm.prank(bob);
         assertEq(ticketSBT.getMyTickets(), bobTickets);
+    }
+
+    function testTransferFromInvalid() public {
+        vm.prank(alice);
+        ticketSBT.buyTicket();
+
+        vm.prank(alice);
+        vm.expectRevert(TicketSBT.ErrLocked.selector);
+        ticketSBT.transferFrom(alice, bob, 1);
+
+        vm.prank(alice);
+        assertTrue(ticketSBT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertFalse(ticketSBT.isMyTicket(1));
+    }
+
+    function testSafeTransferFromInvalid() public {
+        vm.prank(alice);
+        ticketSBT.buyTicket();
+
+        vm.prank(alice);
+        vm.expectRevert(TicketSBT.ErrLocked.selector);
+        ticketSBT.safeTransferFrom(alice, bob, 1);
+
+        vm.prank(alice);
+        assertTrue(ticketSBT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertFalse(ticketSBT.isMyTicket(1));
+    }
+
+    function testApproveInvalid() public {
+        vm.prank(alice);
+        ticketSBT.buyTicket();
+        
+        vm.prank(alice);
+        vm.expectRevert(TicketSBT.ErrLocked.selector);
+        ticketSBT.approve(cara, 1);
+    }
+
+    function testSetApprovalForAllInvalid() public {
+        vm.prank(alice);
+        ticketSBT.buyTicket();
+
+        vm.prank(alice);
+        ticketSBT.buyTicket();
+
+        vm.prank(alice);
+        vm.expectRevert(TicketSBT.ErrLocked.selector);
+        ticketSBT.setApprovalForAll(cara, true);
     }
 }
