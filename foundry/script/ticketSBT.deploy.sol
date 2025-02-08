@@ -2,17 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {TicketNFT} from "@src/ticketNFT.sol";
+import {TicketSBT} from "@src/ticketSBT.sol";
 
-contract TicketNFTScript is Script {
-    TicketNFT public ticketNFT;
+contract TicketSBTScript is Script {
+    TicketSBT public ticketSBT;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        ticketNFT = new TicketNFT();
+        ticketSBT = new TicketSBT();
 
         vm.stopBroadcast();
     }

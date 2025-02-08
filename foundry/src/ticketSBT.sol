@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IERC5192.sol";
 
 // Reference to https://github.com/attestate/ERC5192/blob/main/src/ERC5192.sol
-contract TicketNFT is ERC721, IERC5192 {
+contract TicketSBT is ERC721, IERC5192 {
     uint256 private _nextTokenId;
     bool private isLocked;
 
@@ -15,7 +15,7 @@ contract TicketNFT is ERC721, IERC5192 {
     event TicketBought(address indexed from, uint256 tokenId);
     event TicketCancelled(address indexed from, uint256 tokenId);
 
-    constructor() ERC721("TicketNFT", "TNFT") {
+    constructor() ERC721("TicketSBT", "TSBT") {
         _nextTokenId = 1;
         isLocked = true;
     }
@@ -62,50 +62,27 @@ contract TicketNFT is ERC721, IERC5192 {
         return ownedTickets;
     }
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) public override checkLock {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override checkLock {
         super.safeTransferFrom(from, to, tokenId, data);
     }
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public override checkLock {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override checkLock {
         super.safeTransferFrom(from, to, tokenId);
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public override checkLock {
+    function transferFrom(address from, address to, uint256 tokenId) public override checkLock {
         super.transferFrom(from, to, tokenId);
     }
 
-    function approve(
-        address approved,
-        uint256 tokenId
-    ) public override checkLock {
+    function approve(address approved, uint256 tokenId) public override checkLock {
         super.approve(approved, tokenId);
     }
 
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public override checkLock {
+    function setApprovalForAll(address operator, bool approved) public override checkLock {
         super.setApprovalForAll(operator, approved);
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IERC5192).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IERC5192).interfaceId || super.supportsInterface(interfaceId);
     }
 }
