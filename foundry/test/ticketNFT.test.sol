@@ -9,6 +9,7 @@ contract TicketNFTTest is Test {
     TicketNFT public ticketNFT;
     address public alice = address(0x1);
     address public bob = address(0x2);
+    address public cara = address(0x3);
 
     function setUp() external {
         ticketNFT = new TicketNFT();
@@ -17,10 +18,20 @@ contract TicketNFTTest is Test {
     function testValidateTicketsNotExist() public {
         vm.startPrank(alice);
         assertFalse(ticketNFT.isMyTicket(0));
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721NonexistentToken.selector,
+                0
+            )
+        );
         ticketNFT.ownerOf(0);
         assertFalse(ticketNFT.isMyTicket(1));
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721NonexistentToken.selector,
+                1
+            )
+        );
         ticketNFT.ownerOf(1);
         vm.stopPrank();
     }
@@ -30,7 +41,12 @@ contract TicketNFTTest is Test {
         ticketNFT.buyTicket();
         assertFalse(ticketNFT.isMyTicket(0));
         assertTrue(ticketNFT.isMyTicket(1));
-        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 0));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721NonexistentToken.selector,
+                0
+            )
+        );
         ticketNFT.ownerOf(0);
         assertEq(ticketNFT.ownerOf(1), alice);
         vm.stopPrank();
@@ -109,5 +125,132 @@ contract TicketNFTTest is Test {
         assertEq(ticketNFT.getMyTickets(), aliceTickets);
         vm.prank(bob);
         assertEq(ticketNFT.getMyTickets(), bobTickets);
+    }
+
+    function testTransferFrom() public {
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(alice);
+        ticketNFT.transferFrom(alice, bob, 1);
+
+        vm.prank(alice);
+        assertFalse(ticketNFT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertTrue(ticketNFT.isMyTicket(1));
+    }
+
+    function testSafeTransferFrom() public {
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(alice);
+        ticketNFT.safeTransferFrom(alice, bob, 1);
+
+        vm.prank(alice);
+        assertFalse(ticketNFT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertTrue(ticketNFT.isMyTicket(1));
+    }
+
+    function testApprove() public {
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(cara);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721InsufficientApproval.selector,
+                cara,
+                1
+            )
+        );
+        ticketNFT.transferFrom(alice, bob, 1);
+
+        vm.prank(cara);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721InsufficientApproval.selector,
+                cara,
+                2
+            )
+        );
+        ticketNFT.transferFrom(alice, bob, 2);
+
+        vm.prank(alice);
+        ticketNFT.approve(cara, 1);
+
+        vm.prank(cara);
+        ticketNFT.transferFrom(alice, bob, 1);
+
+        vm.prank(alice);
+        assertFalse(ticketNFT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertTrue(ticketNFT.isMyTicket(1));
+
+        vm.prank(cara);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721InsufficientApproval.selector,
+                cara,
+                2
+            )
+        );
+        ticketNFT.transferFrom(alice, bob, 2);
+    }
+
+    function testSetApprovalForAll() public {
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(alice);
+        ticketNFT.buyTicket();
+
+        vm.prank(cara);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721InsufficientApproval.selector,
+                cara,
+                1
+            )
+        );
+        ticketNFT.transferFrom(alice, bob, 1);
+
+        vm.prank(cara);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IERC721Errors.ERC721InsufficientApproval.selector,
+                cara,
+                2
+            )
+        );
+        ticketNFT.transferFrom(alice, bob, 2);
+
+        vm.prank(alice);
+        ticketNFT.setApprovalForAll(cara, true);
+
+        vm.prank(cara);
+        ticketNFT.transferFrom(alice, bob, 1);
+
+        vm.prank(cara);
+        ticketNFT.transferFrom(alice, bob, 2);
+
+        vm.prank(alice);
+        assertFalse(ticketNFT.isMyTicket(1));
+        
+        vm.prank(alice);
+        assertFalse(ticketNFT.isMyTicket(2));
+
+        vm.prank(bob);
+        assertTrue(ticketNFT.isMyTicket(1));
+
+        vm.prank(bob);
+        assertTrue(ticketNFT.isMyTicket(2));
     }
 }

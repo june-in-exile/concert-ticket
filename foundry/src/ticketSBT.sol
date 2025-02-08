@@ -66,10 +66,6 @@ contract TicketSBT is ERC721, IERC5192 {
         super.safeTransferFrom(from, to, tokenId, data);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override checkLock {
-        super.safeTransferFrom(from, to, tokenId);
-    }
-
     function transferFrom(address from, address to, uint256 tokenId) public override checkLock {
         super.transferFrom(from, to, tokenId);
     }
