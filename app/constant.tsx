@@ -1,7 +1,9 @@
 "use client";
 import { anvil, arbitrumSepolia } from "viem/chains";
 
-export const envChain = process.env.NEXT_PUBLIC_CHAIN as "ARB_SEPOLIA" | "ANVIL";
+export const envChain = process.env.NEXT_PUBLIC_CHAIN as
+  | "ARB_SEPOLIA"
+  | "ANVIL";
 
 let chain;
 let rpcUrl: string;
@@ -17,8 +19,10 @@ export { chain, rpcUrl };
 
 // public
 export const arb_sepolia_chainId = process.env.NEXT_PUBLIC_ARB_SEPOLIA_CHAIN_ID;
-export const contract_address = process.env
-  .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+export const nft_contract_address = process.env
+  .NEXT_PUBLIC_NFT_CONTRACT_ADDRESS as `0x${string}`;
+export const sbt_contract_address = process.env
+  .NEXT_PUBLIC_SBT_CONTRACT_ADDRESS as `0x${string}`;
 
 export const ticketId_pattern = /^(?!0000)\d{4}$/;
 export const address_pattern = /^0x[a-fA-F0-9]{40}$/;

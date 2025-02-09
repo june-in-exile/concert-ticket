@@ -1,4 +1,4 @@
-# Revolutionizing Concert Ticketing with Blockchain and NFTs
+# Revolutionizing Concert Ticketing with Blockchain and Soulbound NFTs
 
 ## Prerequisite: Update .env
 
@@ -28,7 +28,7 @@ $ source .env \
 
 ### 2. Build & Deploy
 
-_(Skip this step if the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env`. is already set.)_
+_(Skip this step if the `NEXT_PUBLIC_SBT_CONTRACT_ADDRESS` field in `.env`. is already set.)_
 
 ```bash
 $ source .env
@@ -52,7 +52,7 @@ Deploy.
 >     --fork-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
 >     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
 >     --private-key ${NEXT_PUBLIC_PRIVATE_KEY} \
->     script/ticketNFT.deploy.sol:TicketNFTScript
+>     script/ticketSBT.deploy.sol:TicketSBTScript
 > ```
 >
 > ### Deploy on Forked Arbitrum Sepolia (for local testing)
@@ -62,15 +62,15 @@ Deploy.
 >     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
 >     --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} \
 >     --broadcast \
->     script/ticketNFT.deploy.sol:TicketNFTScript
+>     script/ticketSBT.deploy.sol:TicketSBTScript
 > ```
 
-Remember to update the `NEXT_PUBLIC_CONTRACT_ADDRESS` field in `.env` with the new contract address.
+Remember to update the `NEXT_PUBLIC_SBT_CONTRACT_ADDRESS` field in `.env` with the new contract address.
 
 Also, update the contract abi:
 
 ```bash
-$ cp foundry/out/ticketNFT.sol/TicketNFT.json app/ticket/TicketNFT.json
+$ cp foundry/out/ticketSBT.sol/TicketSBT.json app/ticket/TicketSBT.json
 ```
 
 ### 3. Start Frontend & Server
@@ -89,7 +89,7 @@ and open [http://localhost:3000](http://localhost:3000) with your browser to see
 Alternatively, you can run this app in docker and interact with the contarct deployed on Arbitrum Sepolia. Ensure that in `.env`:
 
 - [ ] NEXT_PUBLIC_CHAIN="ARB_SEPOLIA"
-- [ ] `NEXT_PUBLIC_CONTRACT_ADDRESS` is set.
+- [ ] `NEXT_PUBLIC_SBT_CONTRACT_ADDRESS` is set.
 - [ ] `NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL` is set.
 
 Then,
@@ -122,49 +122,55 @@ $ cast balance ${NEXT_PUBLIC_ANVIL_ACCOUNT}
 Buy ticket
 
 ```bash
-$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "buyTicket()"
+$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "buyTicket()"
 ```
 
 Validate the ticket
 
 ```bash
-$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "isMyTicket(uint256)(bool)" <tokenId>
+$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "isMyTicket(uint256)(bool)" <tokenId>
 ```
 
 Cancel the ticket
 
 ```bash
-$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "cancelTicket(uint256)" <tokenId>
+$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "cancelTicket(uint256)" <tokenId>
 ```
 
 Get your tickets
 
 ```bash
-$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_CONTRACT_ADDRESS} "getMyTickets()(uint256[])"
+$ cast call --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "getMyTickets()(uint256[])"
 ```
 
 Check your number of tickets
 
 ```bash
-$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_ANVIL_ACCOUNT}
+$ cast call ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "balanceOf(address)(uint256)" ${NEXT_PUBLIC_ANVIL_ACCOUNT}
 ```
 
 Check the owner of a ticket:
 
 ```bash
-$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "ownerOf(uint256)(address)" <tokenId>
+$ cast call ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "ownerOf(uint256)(address)" <tokenId>
 ```
 
-Check the name of the Ticket NFT:
+Transfer a token to Alice:
 
 ```bash
-$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "name()(string)"
-# "TicketNFT"
+$ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "safeTransferFrom(address,address,uint256)" ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_ANVIL_ALICE} <tokenId>
 ```
 
-Check the symbol of the Ticket NFT:
+Check the name of the Ticket SBT:
 
 ```bash
-$ cast call ${NEXT_PUBLIC_CONTRACT_ADDRESS} "symbol()(string)"
-# "TNFT"
+$ cast call ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "name()(string)"
+# "TicketSBT"
+```
+
+Check the symbol of the Ticket SBT:
+
+```bash
+$ cast call ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "symbol()(string)"
+# "TSBT"
 ```

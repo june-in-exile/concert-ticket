@@ -145,7 +145,7 @@ contract TicketSBTTest is Test {
     function testApproveInvalid() public {
         vm.prank(alice);
         ticketSBT.buyTicket();
-        
+
         vm.prank(alice);
         vm.expectRevert(TicketSBT.ErrLocked.selector);
         ticketSBT.approve(cara, 1);

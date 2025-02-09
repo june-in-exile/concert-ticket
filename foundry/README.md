@@ -53,7 +53,7 @@ $ forge script \
     --rpc-url ${NEXT_PUBLIC_ANVIL_RPC_URL} \
     --private-key ${NEXT_PUBLIC_ANVIL_ALICE_PRIVATE_KEY} \
     --broadcast \
-    script/ticketNFT.deploy.sol:TicketNFTScript
+    script/ticketSBT.deploy.sol:TicketSBTScript
 ```
 
 ### Deploy to Arbitrum Sepolia & Verify Automatically
@@ -66,7 +66,7 @@ $ forge script \
     --rpc-url ${NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL} \
     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
     --private-key ${NEXT_PUBLIC_PRIVATE_KEY}
-    script/ticketNFT.deploy.sol:TicketNFTScript
+    script/ticketSBT.deploy.sol:TicketSBTScript
 ```
 
 ### Verify Deployed Contract on Arbitrum Sepolia
@@ -80,7 +80,7 @@ $ forge verify-contract \
     --constructor-args $(cast abi-encode "constructor()") \
     --etherscan-api-key ${NEXT_PUBLIC_ARBISCAN_API_KEY} \
     ${NEXT_PUBLIC_ARB_SEPOLIA_CONTRACT_ADDRESS} \
-    src/ticketNFT.sol:TicketNFT
+    src/ticketSBT.sol:TicketSBT
 ```
 
 ### Cast

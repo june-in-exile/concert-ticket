@@ -13,7 +13,7 @@ import {
   Login,
 } from "../constant";
 import { getClientsAndContract } from "./client";
-import {formatEther} from "viem";
+import { formatEther } from "viem";
 
 export default function Ticket() {
   const router = useRouter();
@@ -45,8 +45,9 @@ export default function Ticket() {
           router.push(`/`);
           return;
         }
+        const isSoulbound = true;
         const { publicClient, walletClient, contract } =
-          await getClientsAndContract(loginMethod, provider);
+          await getClientsAndContract(loginMethod, provider, isSoulbound);
         setPublicClient(publicClient);
         setWalletClient(walletClient);
         setContract(contract);
