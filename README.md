@@ -155,7 +155,7 @@ Check the owner of a ticket:
 $ cast call ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "ownerOf(uint256)(address)" <tokenId>
 ```
 
-Transfer a token to Alice:
+Transfer a ticket to Alice (should fail since it's soulbound):
 
 ```bash
 $ cast send --from ${NEXT_PUBLIC_ANVIL_ACCOUNT} --private-key ${NEXT_PUBLIC_ANVIL_PRIVATE_KEY} ${NEXT_PUBLIC_SBT_CONTRACT_ADDRESS} "safeTransferFrom(address,address,uint256)" ${NEXT_PUBLIC_ANVIL_ACCOUNT} ${NEXT_PUBLIC_ANVIL_ALICE} <tokenId>
